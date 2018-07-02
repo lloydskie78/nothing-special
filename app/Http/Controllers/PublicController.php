@@ -45,7 +45,7 @@ class PublicController extends Controller
                 ->paginate(9);
 
         }else{
-            $products = $products = Product::select('ctproducts.idProduct', 'ctproducts.idSub', 'ctproducts.details', 'ctproducts.imageFile', 'ctbrands.imageFile as brandImageFile', 'ctbrands.brandName', 'department_sub.departmentSubName')
+            $products = Product::select('ctproducts.idProduct', 'ctproducts.idSub', 'ctproducts.details', 'ctproducts.imageFile', 'ctbrands.imageFile as brandImageFile', 'ctbrands.brandName', 'department_sub.departmentSubName')
                 ->leftJoin('ctbrands', 'ctproducts.idBrand', '=', 'ctbrands.idBrand')
                 ->leftJoin('department_sub', 'ctproducts.idDepartmentSub', '=', 'department_sub.id')
                 ->orderByRaw("FIELD(ctbrands.brandName,'ABC','MASTER') DESC,ctbrands.brandName")
@@ -53,7 +53,7 @@ class PublicController extends Controller
                 ->where('idSub', $first_department_id)
                 ->paginate(9);
         }
-
+        $products->appends($request->input());
         $subDepartments = SubDepartment::where('idDepartment', $first_department_id)->get(['id', 'departmentSubName','idDepartment']);
         return view('ProductPerCat', compact('products', 'subDepartments', 'department_id'));
     }
