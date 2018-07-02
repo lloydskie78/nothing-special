@@ -33,21 +33,26 @@ class PublicController extends Controller
         return view('about');
     }
 
-    public function products()
+    public function products(Request $request)
     {
         $first_department_id = Division::with('subcategories')
             ->orderBy('Division','asc')
             ->first()->subcategories
             ->first()->idDepartment;
 
-        $products = $products = Product::select('ctproducts.idProduct', 'ctproducts.idSub', 'ctproducts.details', 'ctproducts.imageFile', 'ctbrands.imageFile as brandImageFile', 'ctbrands.brandName', 'department_sub.departmentSubName')
-            ->leftJoin('ctbrands', 'ctproducts.idBrand', '=', 'ctbrands.idBrand')
-            ->leftJoin('department_sub', 'ctproducts.idDepartmentSub', '=', 'department_sub.id')
-            ->orderByRaw("FIELD(ctbrands.brandName,'ABC','MASTER') DESC,ctbrands.brandName")
-            ->orderByRaw("case when departmentSubName is null then 1 else 0 end, departmentSubName")
-            ->where('idSub', $first_department_id)
-            ->paginate(9);
+        if ($request->has('search')) {
+            $products = Product::search($request->query('search'))
+                ->paginate(9);
 
+        }else{
+            $products = $products = Product::select('ctproducts.idProduct', 'ctproducts.idSub', 'ctproducts.details', 'ctproducts.imageFile', 'ctbrands.imageFile as brandImageFile', 'ctbrands.brandName', 'department_sub.departmentSubName')
+                ->leftJoin('ctbrands', 'ctproducts.idBrand', '=', 'ctbrands.idBrand')
+                ->leftJoin('department_sub', 'ctproducts.idDepartmentSub', '=', 'department_sub.id')
+                ->orderByRaw("FIELD(ctbrands.brandName,'ABC','MASTER') DESC,ctbrands.brandName")
+                ->orderByRaw("case when departmentSubName is null then 1 else 0 end, departmentSubName")
+                ->where('idSub', $first_department_id)
+                ->paginate(9);
+        }
 
         $subDepartments = SubDepartment::where('idDepartment', $first_department_id)->get(['id', 'departmentSubName','idDepartment']);
         return view('ProductPerCat', compact('products', 'subDepartments', 'department_id'));
