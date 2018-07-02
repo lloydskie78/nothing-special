@@ -11,9 +11,8 @@
         @endforeach
     @endsection
     @include('includes.productTopNav')
-    @if(Session::has('error') || empty($subDepartments))
-        <div class="prdctNotFound">{{Session::get('error')[0]}}</div>
-        <h1>{{Session::get('error')}}</h1>
+    @if(Session::has('error') || empty($subDepartments) || empty($products_featured))
+        <div class="prdctNotFound">No Featured Products Found..</div>
     @else
     <aside class="prodlist" id="listShow">
         @foreach($products_featured as $product)

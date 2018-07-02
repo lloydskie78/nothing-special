@@ -56,7 +56,6 @@ class PublicController extends Controller
 
     public function productPerCat(Request $request, $id)
     {
-
         if ($request->has('search')) {
             $products = Product::search($request->query('search'))
                 ->paginate(9);
@@ -98,6 +97,7 @@ class PublicController extends Controller
 
     public function featuredProducts(Request $request)
     {
+        $subDepartments = SubDepartment::all();
         if ($request->has('search')) {
             $products_featured = Product::search($request->query('search'))
                 ->where('isfeatured', 1)
@@ -124,9 +124,9 @@ class PublicController extends Controller
                 ->paginate(2);
         }
         if ($products_featured->isEmpty()) {
-            return view('featuredProducts')->with('error', ["No Featured Products Found.."]);
+            return view('featuredProducts',compact('subDepartments'))->with('error', ["No Featured Products Found.."]);
         }
-        $subDepartments = SubDepartment::all();
+
         return view('featuredProducts', compact('products_featured', 'subDepartments'));
     }
 
