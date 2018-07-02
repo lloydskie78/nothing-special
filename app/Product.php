@@ -22,7 +22,7 @@ class Product extends Model
     }
 
     public function toSearchableArray(){
-        $array = $this->only('prodName','prodCode','details');
+        $array = $this->only('prodName','prodCode');
 
         return $array;
     }

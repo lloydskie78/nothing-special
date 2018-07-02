@@ -48,7 +48,7 @@
                     <div class="otherbranch">
                         <a href="{{route('branch',['id' => $branch->idBranch])}}">
                             <img src="{{asset("assets/img/branch/$branch->imageFile")}}" alt="">
-                            <p> {{$branch->bName}}</p>
+                            <p> {{$branch->branchName}}</p>
                         </a>
                     </div>
                 @endforeach
