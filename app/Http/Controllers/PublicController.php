@@ -102,7 +102,7 @@ class PublicController extends Controller
 
     public function featuredProducts(Request $request)
     {
-        $subDepartments = SubDepartment::all();
+        $subDepartments = SubDepartment::whereNotIn('id',[1,88])->get();
         if ($request->has('search')) {
             $products_featured = Product::search($request->query('search'))
                 ->where('isfeatured', 1)

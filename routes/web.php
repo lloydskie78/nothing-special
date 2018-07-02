@@ -63,19 +63,7 @@ Route::prefix('admin')->group(function () {
 });
 
 Route::get('/test',function (){
-    $products = Product::select('ctproducts.idProduct','ctproducts.details','ctproducts.imageFile','ctbrands.imageFile as brandImageFile','ctbrands.brandName','department_sub.departmentSubName')
-        ->leftJoin('ctbrands','ctproducts.idBrand','=','ctbrands.idBrand')
-        ->leftJoin('department_sub','ctproducts.idDepartmentSub','=','department_sub.id')
-        ->orderByRaw("FIELD(ctbrands.brandName,'ABC','MASTER') DESC,ctbrands.brandName")
-        ->orderByRaw("case when departmentSubName is null then 1 else 0 end, departmentSubName")
-        ->where('ctproducts.isfeatured',1)->get();
-//    dd($products);
-    foreach ($products as $product){
-        echo "<pre>";
-        echo $product->brandName . " " . substr($product->details,0,-1);
-        echo "</pre>";
-        echo "</br>";
-    }
+    echo public_path();
 
 });
 
