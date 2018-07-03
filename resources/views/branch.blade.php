@@ -1,7 +1,7 @@
 @extends('layouts.master')
 @section('bg-img',asset('assets/img/header-sliders/branches.jpg'))
 @section('content')
-    <div class="indivbrnchcontent col-10">
+    <div class="indivbrnchcontent col-10 pageContent">
         <h1>Our Branches</h1>
         <div class="row1">
             <aside>

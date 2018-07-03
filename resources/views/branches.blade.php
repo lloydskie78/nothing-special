@@ -1,7 +1,7 @@
 @extends('layouts.master')
 @section('bg-img',asset('assets/img/header-sliders/matina.jpg'))
 @section('content')
-<div class="brnchcontent col-10">
+<div class="brnchcontent col-10 pageContent">
     <h1 class="header-text mb-0">Our Branches</h1>
     <p class="text">CitiHardware's 60 stores are strategically located throughout the Philippines' major regions of Luzon, Visayas, and Mindanao and is expected to continuously grow in the coming years.</p>
     <div class="brnchbody">

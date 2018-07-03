@@ -1,7 +1,7 @@
 @extends('layouts.master')
 @section('bg-img',asset('assets/img/header-sliders/matina.jpg'))
 @section('content')
-<div class="newsNupbody col-10">
+<div class="newsNupbody col-10 pageContent">
     <h1 class="header-text">What's new</h1>
     <p class="text">We are constantly growing! Our stores nationwide are open 7 days a week and ready to assist you for your building projects and home improvement needs.</p>
     <div class="nwsNupcontainer">

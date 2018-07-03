@@ -1,7 +1,7 @@
 @extends('layouts.master')
 @section('bg-img',asset('assets/img/header-sliders/matina.jpg'))
 @section('content')
-    <div class="aboutcontent col-10">
+    <div class="aboutcontent col-10 pageContent">
         <h1 class="header-text">About Us</h1>
         <p>From its beginnings as a traditional hardware store in 1976, CitiHardware is now one of the leading and fastest growing construction retail stores with more than 50 branches in the Philippines.</p>
         <p>At present, CitiHardware continues to lead in offering its customers great value on world-class products sourced from local and international suppliers. Excellent customer service is a top priority in driving customer loyalty and satisfaction.</p>

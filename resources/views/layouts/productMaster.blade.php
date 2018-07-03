@@ -5,7 +5,7 @@
 
     <section class="product_section">
         <div class="col-10">
-            <h1 class="header-text m-b-0">Products</h1>
+            <h1 class="header-text m-b-0 mtop">Products</h1>
 
             <div class="prdctbdy">
                 <aside id="mySidenav" class="catlist">

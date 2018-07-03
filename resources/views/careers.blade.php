@@ -2,13 +2,13 @@
 @section('bg-img',asset('assets/img/header-sliders/revised.jpg'))
 @section('content')
 
-<div class="carcontent col-10">
+<div class="carcontent col-10 pageContent">
     <div class="carheadr">
         @foreach($jobcat as $cat)
             <a href='javascript:void();' class='hvr-float jobcat' data-id='{{$cat->id}}'>{{$cat->name}}</a>
         @endforeach
     </div>
-    <h1 class="cartitle">Store Support</h1>
+    <h1 class="cartitle mtop">Store Support</h1>
     <div class="carbdy"></div>
     <div class="carfootr">
         <div class="requirements">
