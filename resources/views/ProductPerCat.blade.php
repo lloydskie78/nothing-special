@@ -22,7 +22,7 @@
             <a class='product_box hvr-grow productClass indiProducts' data-fancybox
                href='{{asset("assets/img/products/$product->imageFile")}}'
                data-feature='{!! nl2br($product->details) !!}' data-idProduct={{$product->idProduct}}>
-                <div class='prdctimagecontainer'><img src='{{asset("assets/img/products/$product->imageFile")}}'
+                <div class='prdctimagecontainer'><img src='{{asset("assets/img/products/$product->imageFile")}}' alt="{{$product->details}}"
                                                       onerror="if (this.src != '{{asset('assets/img/error.png')}}') this.src = '{{asset('assets/img/error.png')}}';">
                 </div>
                 <hr>
