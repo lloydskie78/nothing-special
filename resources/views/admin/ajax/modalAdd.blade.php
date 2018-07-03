@@ -111,7 +111,7 @@
             </div>
             <div class="form-group">
                 {{Form::label('Job Description')}}
-                {{Form::textarea('desc',null,['class' => 'form-control','placeholder' => 'Description','required','rows' => 3])}}
+                {{Form::textarea('desc',"<br><ul>\r\n\t<li></li>\r\n\t<li></li>\r\n\t<li></li>\r\n</ul>",['class' => 'form-control','placeholder' => 'Description','required','rows' => 5])}}
             </div>
             <div class="form-group">
                 {{Form::label('Job Category')}}
