@@ -60,7 +60,7 @@
         <div class="branches col-10">
             <div>
                 <h1 class="header-text">Nationwide Network</h1>
-                <p class="text">CitiHardware's 50+ stores are strategically located throughout the Philippines' major regions of Luzon, Visayas, and Mindanao and is expected to continuously grow in the coming years.</p>
+                <p class="text">CitiHardware's 60 stores are strategically located throughout the Philippines' major regions of Luzon, Visayas, and Mindanao and is expected to continuously grow in the coming years.</p>
             </div>
             <div class="maprow">
                 <div class="left">
