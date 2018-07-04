@@ -61,7 +61,7 @@
 <div class="container">
     <header>
 
-        <div class="header" style="background: #c82333 url('@yield('bg-img')') no-repeat center bottom">
+        <div class="header" style="background: #c82333 url('@yield('bg-img')') no-repeat center bottom;background-size: cover;">
 
         </div>
         @yield('header-content')
