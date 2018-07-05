@@ -165,14 +165,13 @@ class PublicController extends Controller
         $google_coords = $branch->latlng;
         $google_coords = explode(',', $google_coords);
 
-        if($islandGroup === 1){
+        if($islandGroup === "1"){
             $islandGroupName = 'Luzon';
-        }elseif ($islandGroup === 2){
+        }elseif ($islandGroup === "2"){
             $islandGroupName = 'Visayas';
         }else{
             $islandGroupName = 'Mindanao';
         }
-
         return view('branch', ['branch' => $branch, 'branch_except' => $except_branches, 'long' => $google_coords[1], 'lat' => $google_coords[0], 'islandName' => $islandGroupName]);
     }
 
