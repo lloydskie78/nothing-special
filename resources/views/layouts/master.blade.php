@@ -1,8 +1,11 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html lang="eng">
 
-<head>
+<head xmlns="http://www.w3.org/1999/xhtml">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="description" content="From its beginnings as a traditional hardware store in 1976, CitiHardware is now one of the leading and fastest growing construction retail stores with more than 50 branches in the Philippines." />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>CITIHARDWARE &middot The Home Improvement Warehouse</title>
     <link rel="icon" href="{{asset('assets/img/logo.png')}}">
