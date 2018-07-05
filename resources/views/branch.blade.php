@@ -42,7 +42,7 @@
             </aside>
         </div>
         <div class="row2 border-top">
-            <h2>Other Luzon Branches</h2>
+            <h2>Other {{$islandName}} Branches</h2>
             <div class="otherbranches">
                 @foreach($branch_except as $branch)
                     <div class="otherbranch">
