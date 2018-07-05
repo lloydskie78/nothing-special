@@ -79,7 +79,7 @@
                                 @endforeach
                             </ul>
                             <ul class="min">
-                                <li>Mindandao</li>
+                                <li>Mindanao</li>
                                 @foreach($min as $m_branch)
                                     <li><a class='indiv_branch hvr-grow' href='{{route('branch',['id' => $m_branch->idBranch])}}'>{{$m_branch->branchName}}</a></li>
                                 @endforeach
