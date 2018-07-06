@@ -6,7 +6,7 @@
         <div class="row1">
             <aside>
                 <img src="{{asset("assets/img/branch/$branch->imageFile")}}">
-                <h3>{{$branch->bName}}</h3>
+                <h3 class="indivbrnchcontent__name">{{$branch->bName}}</h3>
                 <table id="branch-table" class="lh25">
                     <tbody>
                     <tr>
@@ -41,8 +41,8 @@
                 <div id="googlemap" data-longitude="{{$long}}" data-latitude="{{$lat}}"></div>
             </aside>
         </div>
-        <div class="row2 border-top">
-            <h2>Other {{$islandName}} Branches</h2>
+        <div class="row2 border-top otherBranches">
+            <h2 class="otherBranches__label">Other {{$islandName}} Branches</h2>
             <div class="otherbranches">
                 @foreach($branch_except as $branch)
                     <div class="otherbranch">
