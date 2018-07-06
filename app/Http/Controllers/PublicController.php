@@ -109,7 +109,7 @@ class PublicController extends Controller
                 ->paginate(2);
 
         }elseif($request->has('category')){
-            $products_featured = Product::select('ctproducts.idProduct', 'ctproducts.details', 'ctproducts.imageFile', 'ctbrands.imageFile as brandImageFile', 'ctbrands.brandName', 'department_sub.departmentSubName')
+            $products_featured = Product::select('ctproducts.idProduct', 'ctproducts.details', 'ctproducts.imageFile','ctproducts.feaImageFile', 'ctbrands.imageFile as brandImageFile', 'ctbrands.brandName', 'department_sub.departmentSubName')
                 ->leftJoin('ctbrands', 'ctproducts.idBrand', '=', 'ctbrands.idBrand')
                 ->leftJoin('department_sub', 'ctproducts.idDepartmentSub', '=', 'department_sub.id')
                 ->orderByRaw("FIELD(ctbrands.brandName,'ABC','MASTER') DESC,ctbrands.brandName")
@@ -120,7 +120,7 @@ class PublicController extends Controller
                     ])
                 ->paginate(2);
         }else{
-            $products_featured = Product::select('ctproducts.idProduct', 'ctproducts.details', 'ctproducts.imageFile', 'ctbrands.imageFile as brandImageFile', 'ctbrands.brandName', 'department_sub.departmentSubName')
+            $products_featured = Product::select('ctproducts.idProduct', 'ctproducts.details', 'ctproducts.imageFile','ctproducts.feaImageFile', 'ctbrands.imageFile as brandImageFile', 'ctbrands.brandName', 'department_sub.departmentSubName')
                 ->leftJoin('ctbrands', 'ctproducts.idBrand', '=', 'ctbrands.idBrand')
                 ->leftJoin('department_sub', 'ctproducts.idDepartmentSub', '=', 'department_sub.id')
                 ->orderByRaw("FIELD(ctbrands.brandName,'ABC','MASTER') DESC,ctbrands.brandName")

@@ -16,8 +16,8 @@
     @else
     <aside class="prodlist" id="listShow">
         @foreach($products_featured as $product)
-            <a class='feaProduct_box hvr-grow productClass indiProducts' data-fancybox href='{{asset("assets/img/products/$product->imageFile")}}'  data-feature='{!! nl2br($product->details) !!}' data-idProduct={{$product->idProduct}}>
-                <div class='featuredPrdctimagecontainer'><img src='{{asset("assets/img/products/$product->imageFile")}}'  alt="{{$product->details}}" onerror="if (this.src != '{{asset('assets/img/error.png')}}') this.src = '{{asset('assets/img/error.png')}}';"></div>
+            <a class='feaProduct_box hvr-grow productClass indiProducts' data-fancybox href='{{asset("assets/img/products/featuredImage/$product->feaimageFile")}}'  data-feature='{!! nl2br($product->details) !!}' data-idProduct={{$product->idProduct}}>
+                <div class='featuredPrdctimagecontainer'><img src='{{asset("assets/img/products/featuredImage/$product->feaImageFile")}}'  alt="{{$product->details}}" onerror="if (this.src != '{{asset('assets/img/error.png')}}') this.src = '{{asset('assets/img/error.png')}}';"></div>
                 <p class='feaprod_details'> {!! nl2br($product->details) !!}</p>
             </a>
         @endforeach

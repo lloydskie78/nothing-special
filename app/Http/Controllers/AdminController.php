@@ -99,8 +99,8 @@ class AdminController extends Controller
                     $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
                     $destinationPath = public_path('assets/img/brands');
                     $image->move($destinationPath, $input['imageFile']);
-                    $update = array_merge(['imageFile' => $input['imageFile']],$request->except(['_token', 'form_id', 'idToBeUpdated','imageFile']));
-                }else{
+                    $update = array_merge(['imageFile' => $input['imageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'imageFile']));
+                } else {
                     $update = $request->except(['_token', 'form_id', 'idToBeUpdated']);
                 }
 
@@ -114,13 +114,35 @@ class AdminController extends Controller
 
                 ]);
                 $product = Product::whereIn('idProduct', $id);
-                if ($request->hasFile('imageFile')) {
+
+                if ($request->hasFile('imageFile') && $request->hasFile('feaImageFile')) {
+                    $image = $request->file('imageFile');
+                    $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
+                    $destinationPath = public_path('assets/img/products');
+                    $image->move($destinationPath, $input['imageFile']);
+
+                    $feaImage = $request->file('feaImageFile');
+                    $input['feaImageFile'] = $feaImage->getClientOriginalName() . '.' . $feaImage->getClientOriginalExtension();
+                    $destinationPath = public_path('assets/img/products/featuredImage');
+                    $feaImage->move($destinationPath, $input['feaImageFile']);
+
+                    $update = array_merge(['imageFile' => $input['imageFile']],$request->except(['_token', 'form_id', 'idToBeUpdated','imageFile','feaImageFile']));
+
+                }else if ($request->hasFile('imageFile')) {
                     $image = $request->file('imageFile');
                     $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
                     $destinationPath = public_path('assets/img/products');
                     $image->move($destinationPath, $input['imageFile']);
                     $update = array_merge(['imageFile' => $input['imageFile']],$request->except(['_token', 'form_id', 'idToBeUpdated','imageFile']));
-                }else{
+                }else if($request->hasFile('feaImageFile')){
+
+                    $feaImage = $request->file('feaImageFile');
+                    $input['feaImageFile'] = pathinfo($feaImage->getClientOriginalName(),PATHINFO_FILENAME) . '.' . $feaImage->getClientOriginalExtension();
+                    $destinationPath = public_path('assets/img/products/featuredImage');
+                    $feaImage->move($destinationPath, $input['feaImageFile']);
+                    $update = array_merge(['feaImageFile' => $input['feaImageFile']],$request->except(['_token', 'form_id', 'idToBeUpdated','feaImageFile']));
+
+                }else {
                     $update = $request->except(['_token', 'form_id', 'idToBeUpdated']);
                 }
 
@@ -282,6 +304,19 @@ class AdminController extends Controller
                     $data->imageFile = $input['imageFile'];
                 }
 
+                if ($request->hasFile('feaImageFile')) {
+
+
+                    $feaImage = $request->file('feaImageFile');
+
+                    $input['feaImageFile'] = pathinfo($feaImage->getClientOriginalName(),PATHINFO_FILENAME) . '.' . $feaImage->getClientOriginalExtension();
+
+                    $destinationPath = public_path('assets/img/products/featuredImage');
+
+                    $feaImage->move($destinationPath, $input['feaImageFile']);
+                    $data->feaImageFile = $input['feaImageFile'];
+                }
+
                 $data->save();
                 break;
             case 'news_add':
@@ -397,9 +432,11 @@ class AdminController extends Controller
                 $data = Brand::destroy($rows);
                 break;
             case 'product_table':
-                $imageRows = Product::whereIn('idProduct',$rows)->pluck('imageFile');
+                $imageRows = Product::whereIn('idProduct',$rows)->get(['imageFile','feaImageFile']);
+
                 foreach ($imageRows as $image){
-                    $file = File::delete($imagePath.'products/'.$image);
+                    $file = File::delete($imagePath.'products/'.$image->imageFile);
+                    $feaFile = File::delete($imagePath.'products/featuredImage/'.$image->feaImageFile);
                 }
                 $data = Product::destroy($rows);
                 break;

@@ -62,8 +62,15 @@
                 {{Form::label('Details')}}
                 {{Form::textarea('details',$data->details,['class' => 'form-control textarea-no-styles','rows' => 3])}}
             </div>
-            <div class="form-group">
-                {{Form::file('imageFile',null,['class' => 'form-control-file form_image','accept'=>'image/*'])}}
+            <div class="form-row mb-2">
+                <div class="col-6">
+                    <h7>Product Image: </h7>
+                    {{Form::file('imageFile',null,['class' => 'form-control-file form_image','accept'=>'image/*'])}}
+                </div>
+                <div class="col-6">
+                    <h7>Featured Image: </h7>
+                    {{Form::file('feaImageFile',null,['class' => 'form-control-file form_image','accept'=>'image/*'])}}
+                </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-6">
@@ -80,7 +87,10 @@
             {!! Form::close() !!}
         </div>
         <div class="container-fluid col-6">
+            <h3>Image Preview: </h3>
             <img src="{{asset('assets/img/products/'.$data->imageFile)}}" class="img-fluid">
+            <h3>Featured Image Peview: </h3>
+            <img src="{{asset('assets/img/products/featuredImage/'.$data->feaImageFile)}}" class="img-fluid">
         </div>
     </div>
 

@@ -13,7 +13,7 @@ class Product extends Model
 
     protected $table = 'ctproducts';
     protected $primaryKey = 'idProduct';
-    protected $fillable = ['idBrand','idParent','idSub','prodName','prodCode','details','price','imageFile','availability','isfeatured','barcode'];
+    protected $fillable = ['idBrand','idParent','idSub','prodName','prodCode','details','price','imageFile','feaImageFile','availability','isfeatured','barcode'];
 
     public function brand()
     {

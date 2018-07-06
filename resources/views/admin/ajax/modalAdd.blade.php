@@ -56,8 +56,15 @@
             {{Form::label('Details')}}
             {{Form::textarea('details',null,['class' => 'form-control textarea-no-styles','rows' => 3],'required')}}
         </div>
-        <div class="form-group">
-            {{Form::file('imageFile',null,['class' => 'form-control-file form_image','accept'=>'image/*'])}}
+        <div class="form-row">
+            <div class="form-group col-6">
+                <span>Product Image: </span>
+                {{Form::file('imageFile',null,['class' => 'form-control-file form_image','accept'=>'image/*'])}}
+            </div>
+            <div class="form-group col-6">
+                <span>Featued Image: </span>
+                {{Form::file('feaImageFile',null,['class' => 'form-control-file form_image','accept'=>'image/*'])}}
+            </div>
         </div>
         <div class="form-row">
             <div class="form-group col-6">
