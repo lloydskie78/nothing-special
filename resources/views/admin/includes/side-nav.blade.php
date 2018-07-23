@@ -2,7 +2,7 @@
     <nav class="sidebar-nav">
         <ul class="nav">
             <li class="nav-title">Navigation</li>
-
+            @if(Auth::user()->hr != 1)
             <li class="nav-item">
                 <a href="{{route('dashboard')}}" class="nav-link {{Route::currentRouteName() == 'dashboard' ? 'active' : ''}}">
                     <i class="icon icon-speedometer"></i> Dashboard
@@ -55,7 +55,7 @@
                     <i class="icon icon-globe"></i> Branches
                 </a>
             </li>
-
+            @endif
             <li class="nav-item">
                 <a href="{{route('dashboardCareers')}}" class="nav-link {{Route::currentRouteName() == 'dashboardCareers' ? 'active' : ''}}">
                     <i class="icon icon-people"></i> Careers

@@ -24,7 +24,7 @@ class AdminController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('CheckRole:admin');
+        $this->middleware('CheckRole:hr,admin');
     }
 
     public function index()
@@ -368,7 +368,12 @@ class AdminController extends Controller
                 $data->save();
                 break;
             case 'career_add':
+
+                $career = Career::where('catId',$request['catID'])->orderBy('dbstat','DESC')->first();
+                $dbstat = $career->dbstat++;
+
                 $data = new Career();
+                $data->dbstat = $dbstat;
                 $data->fill($request->except(['_token', 'form_id']));
                 $this->validate($request, [
 
@@ -567,7 +572,6 @@ class AdminController extends Controller
         $form_id = $request->input('btn_id');
 
         $id = explode(',', $request->input('rows'));
-
         if (count($id) == 1) {
             $id_update = $request->input('rows');
         } else {
@@ -605,6 +609,7 @@ class AdminController extends Controller
         }
 
         return view('admin.ajax.modalEdit', ['data' => $data, 'form_id' => $form_id]);
+
     }
 
     public function modalAdd(Request $request)

@@ -12,7 +12,8 @@ class Career extends Model
         'jobTitle',
         'catID',
         'desc',
-        'status'
+        'status',
+        'dbstat'
     ];
 
     public function jobcategory(){

@@ -136,10 +136,17 @@
         {{Form::label('Job Description')}}
         {{Form::textarea('desc',null,['class' => 'form-control','placeholder' => 'Description','required','rows' => 3])}}
     </div>
-    <div class="form-group">
-        {{Form::label('Job Category')}}
-        {{Form::select('catID', $select_jobcat, null,['class' => 'custom-select custom-select-sm','required'])}}
+    <div class="form-row">
+        <div class="form-group col-6">
+            {{Form::label('Job Category')}}
+            {{Form::select('catID', $select_jobcat, null,['class' => 'custom-select custom-select','required'])}}
+        </div>
+        <div class="form-group col-6">
+            {{Form::label('Order')}}
+            {{Form::text('dbstat',null,['class' => 'form-control','placeholder' => 'Input Order','required'])}}
+        </div>
     </div>
+
     <div class="form-group">
         {{Form::label('Status')}}
         {{Form::select('status', [0 => 'Inactive', 1 => 'Active'], null,['class' => 'custom-select custom-select-sm','required'])}}
