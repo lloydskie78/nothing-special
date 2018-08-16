@@ -79,7 +79,9 @@
     <div class="footer col-10 white">
         <div>
             <aside>
-                <p><span><strong>Head Office</strong></span><br>Quimpo Blvd., Matina, Davao City<br>8000, Philippines</p>
+                <p><span><strong>Store Support Center
+</strong></span><br>Quimpo 
+Blvd., Matina, Davao City<br>8000, Philippines</p>
             </aside>
             <aside>
                 <p>Follow us on:</p>
