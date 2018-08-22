@@ -1,8 +1,9 @@
 @extends('layouts.master')
 @section('header-content')
-    <video muted loop="true" autoplay="autoplay" id="bgvid">
-        <source type="video/mp4" src="{{asset('assets/img/header-sliders/cvideo.mp4')}}">
-        <source type="video/ogg" src="{{asset('assets/img/header-sliders/cvideo.ogg')}}">
+    <video muted loop autoplay id="bgvid">
+        <source type="video/mp4" src="{{asset('assets/img/header-sliders/header_video.mp4')}}">
+        <source type="video/webm" src="{{asset('assets/img/header-sliders/header_video.webm')}}">
+        Your browser does not support this video type
     </video>
 @endsection
 @section('content')
