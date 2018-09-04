@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('header-content')
-    <video muted loop autoplay id="bgvid">
+    <video muted loop="true" autoplay="autoplay" id="bgvid">
         <source type="video/mp4" src="{{asset('assets/img/header-sliders/header_video.mp4')}}">
         <source type="video/webm" src="{{asset('assets/img/header-sliders/header_video.webm')}}">
         Your browser does not support this video type
