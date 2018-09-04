@@ -54,7 +54,7 @@ class PublicController extends Controller
                 ->paginate(9);
         }
         $products->appends($request->input());
-        $subDepartments = SubDepartment::where('idDepartment', $first_department_id)->get(['id', 'departmentSubName','idDepartment']);
+        $subDepartments = SubDepartment::where('idDepartment', $first_department_id)->orderBy('departmentSubName','ASC')->get(['id', 'departmentSubName','idDepartment']);
         return view('ProductPerCat', compact('products', 'subDepartments', 'department_id'));
     }
 
@@ -96,7 +96,7 @@ class PublicController extends Controller
 
         $products->appends($request->input());
         $department_id = $products->first()->idSub;
-        $subDepartments = SubDepartment::where('idDepartment', $id)->get(['id', 'departmentSubName','idDepartment']);
+        $subDepartments = SubDepartment::where('idDepartment', $id)->orderBy('departmentSubName','ASC')->get(['id', 'departmentSubName','idDepartment']);
         return view('ProductPerCat', compact('products', 'subDepartments', 'department_id'));
     }
 
