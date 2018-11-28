@@ -27,6 +27,7 @@
                 <th>Department</th>
                 <th>Availability</th>
                 <th>Image</th>
+                <th>Details</th>
             </tr>
             </thead>
             <tbody>
@@ -68,7 +69,8 @@
                         data: 'imageFile', render: function (data) {
                             return '<img src="../assets/img/products/' + data + '" class="img-fluid">';
                         }
-                    }
+                    },
+                    {data:'details',visible:false}
                 ], "columnDefs": [{
                     "orderable": false,
                     "targets": 0
