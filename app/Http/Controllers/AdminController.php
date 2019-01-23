@@ -209,6 +209,8 @@ class AdminController extends Controller
 
                 ]);
 
+                $ulMarkup = GenerateUlMarkUp($request->desc);
+                $request->merge(['desc' => $ulMarkup]);
                 $career = Career::whereIn('idJob', $id);
                 $data = $career->update($request->except(['_token', 'form_id', 'idToBeUpdated']));
                 break;
@@ -368,6 +370,10 @@ class AdminController extends Controller
                 $data->save();
                 break;
             case 'career_add':
+
+                $ulMarkup = GenerateUlMarkUp($request->desc);
+
+                $request->merge(['desc' => $ulMarkup]);
 
                 $career = Career::where('catId',$request['catID'])->orderBy('dbstat','DESC')->first();
                 $dbstat = $career->dbstat++;
