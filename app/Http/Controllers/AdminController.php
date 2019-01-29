@@ -209,7 +209,12 @@ class AdminController extends Controller
 
                 ]);
 
-                $ulMarkup = GenerateUlMarkUp($request->desc);
+                if(!isHTML($request->desc)) {
+                    $ulMarkup = GenerateUlMarkUp($request->desc);
+                }else{
+                    $ulMarkup = $request->desc;
+                }
+
                 $request->merge(['desc' => $ulMarkup]);
                 $career = Career::whereIn('idJob', $id);
                 $data = $career->update($request->except(['_token', 'form_id', 'idToBeUpdated']));

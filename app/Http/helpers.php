@@ -29,4 +29,6 @@ if (!function_exists (  'GenerateUlMarkUp' )){
         return $implodedLi;
     }
 }
+
+function isHTML( $str ) { return preg_match( "/\/[a-z]*>/i", $str ) != 0; }
 ?>

@@ -134,10 +134,10 @@
     </div>
     <div class="form-group">
         {{Form::label("Job Description")}}
-      {{--  <div class="description" contentEditable="true">
+        <div class="description border" contentEditable="true">
             {!! $data->desc !!}
-        </div>--}}
-        {{Form::textarea('desc',"",['class' => 'form-control careerDesc','placeholder' => 'Description','required','rows' => 3])}}
+        </div>
+        {{Form::textarea('desc',null,['class' => 'form-control careerDesc','placeholder' => 'Description','required','rows' => 3,'hidden'])}}
     </div>
     <div class="form-row">
         <div class="form-group col-6">
