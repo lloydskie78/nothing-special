@@ -35,6 +35,12 @@
                             <i class="icon icon-list"></i> Product Sub Department
                         </a>
                     </li>
+                    <li class="nav-dropdown-items">
+                        <a href="{{route('dashboardProductArchive')}}" class="nav-link {{Route::currentRouteName() == 'dashboardProductArchive' ? 'active' : ''}}">
+                            <i class="icon icon-list"></i> Products Archive
+                        </a>
+                    </li>
+                   
                 </ul>
             </li>
 
@@ -61,9 +67,17 @@
                     <i class="icon icon-people"></i> Careers
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="{{route('dashboardbanner')}}" class="nav-link {{Route::currentRouteName() == 'dashboardProductDepartmentSub' ? 'active' : ''}}">
+                    <i class="icon-picture"></i> Banner
+                </a>
+            </li>
+             <li class="nav-item">
+                <a href="{{route('dashboardlink')}}" class="nav-link {{Route::currentRouteName() == 'dashboardProductDepartmentSub' ? 'active' : ''}}">
+                    <i class="icon-grid"></i> Featured
 
-
-
+                </a>
+            </li>
         </ul>
     </nav>
 </div>

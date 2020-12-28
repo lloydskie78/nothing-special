@@ -1,5 +1,5 @@
 @extends('layouts.master')
-@section('bg-img',asset('assets/img/header-sliders/matina.jpg'))
+@section('bg-img',asset('assets/img/banner/News and Update.jpg'))
 @section('content')
 <div class="newsNupbody col-10 pageContent">
     <h1 class="header-text">What's new</h1>

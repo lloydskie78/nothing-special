@@ -44,7 +44,7 @@
                                     </span>
                                 @endif
                             </div>
-
+                            
                             <div class="custom-control custom-checkbox mt-4">
                                 <input type="checkbox" class="custom-control-input" id="login"
                                        name="remember" {{ old('remember') ? 'checked' : '' }}>

@@ -7,7 +7,7 @@
                 <div class="card p-4">
                     <div class="card-body d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="h4 d-block font-weight-normal mb-2">{{$products->count()}}</span>
+                            <span class="h4 d-block font-weight-normal mb-2">{{ $products->count() }}</span>
                             <span class="font-weight-light">Total Products</span>
                         </div>
 
@@ -22,7 +22,7 @@
                 <div class="card p-4">
                     <div class="card-body d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="h4 d-block font-weight-normal mb-2">{{$branches->count()}}</span>
+                            <span class="h4 d-block font-weight-normal mb-2">{{ $branches->count() }}</span>
                             <span class="font-weight-light">Total Branches</span>
                         </div>
 
@@ -37,7 +37,7 @@
                 <div class="card p-4">
                     <div class="card-body d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="h4 d-block font-weight-normal mb-2">{{$brands->count()}}</span>
+                            <span class="h4 d-block font-weight-normal mb-2">{{ $brands->count() }}</span>
                             <span class="font-weight-light">Total Brands</span>
                         </div>
 

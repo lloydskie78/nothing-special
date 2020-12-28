@@ -15,16 +15,23 @@ class Department extends Model
         'department_status'
     ];
 
-    public function division(){
-        return $this->hasOne('App\Division','idDivision','idDivision');
+    public function division()
+    {
+        return $this->hasOne('App\Division', 'idDivision', 'idDivision');
     }
 
-    public function subDepartment(){
-        return $this->hasMany('App\SubDepartment','idDepartment','idDepartment');
+    public function subDepartment()
+    {
+        return $this->hasMany('App\SubDepartment', 'idDepartment', 'idDepartment');
     }
 
     public function scopeDepartmentAscending($query)
     {
-        return $query->orderBy('Department','asc');
+        return $query->orderBy('Department', 'asc');
+    }
+
+    public function products()
+    {
+        return $this->hasMany(\App\Product::class, 'idSub', 'idDepartment');
     }
 }

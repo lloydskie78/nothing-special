@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\DB;
 
 class FormApplication extends Mailable
 {
@@ -22,13 +23,20 @@ class FormApplication extends Mailable
     protected $file;
     protected $contact;
     protected $name;
-
+    protected $position;
+    protected $date;
+    protected $sender;
     public function __construct($formData)
     {
+
         $this->contact = $formData['contact'];
         $this->email = $formData['email'];
         $this->name = $formData['name'];
         $this->file = $formData['attachment'];
+        $this->branch = $formData['branchVal'];
+        $this->position = $formData['careers'];
+        $this->date = date("m-d-Y");
+        $this->sender = 'citiadmin@decoarts.com.ph';
     }
 
     /**
@@ -39,9 +47,18 @@ class FormApplication extends Mailable
     public function build()
     {
 //        dd($this->file->getRealPath());
-        return $this->from($this->email,$this->name)
-            ->subject('Application')
-            ->attach($this->file->getRealPath(),['as' => $this->file->getClientOriginalName(),'mime' => $this->file->getMimeType()])
-            ->view('emails.application');
+        return $this->from($this->sender,$this->name)
+            ->replyTo($this->email, $this->name)
+            ->subject('Applicant for '. $this->branch .' from citihardware.com')
+            ->attach($this->file
+            ->getRealPath(),['as' => $this->file
+            ->getClientOriginalName(),'mime' => $this->file
+            ->getMimeType()])
+            ->view('emails.application')
+            ->with('email', $this->email)
+            ->with('name', $this->name)
+            ->with('contact', $this->contact)
+            ->with('position', $this->position)
+            ->with('date', $this->date);
     }
 }

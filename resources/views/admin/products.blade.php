@@ -9,7 +9,7 @@
         <div class="mb-2">
             <button data-btn='product_add' type="button" class="btn btn-primary btn-sm" data-modal="add" data-toggle="modal" data-target="#myModal">Add Product</button>
             <button type="button" class="btn btn-primary btn-sm btn_edit" data-btn="product_edit" data-modal="edit">Edit Product/'s</button>
-            <button type="button" class="btn btn-danger btn-sm btn_delete" >Delete Product/'s</button>
+            <button type="button" class="btn btn-danger btn-sm btn_softdelete" >Delete Product/'s</button>
         </div>
         <table class='table table-bordered table-hover display table-sm' id='product_table'>
             <thead>
@@ -33,10 +33,9 @@
             <tbody>
             </tbody>
         </table>
-
     </div>
+    
 @endsection
-
 
 @push('scripts')
     <script>

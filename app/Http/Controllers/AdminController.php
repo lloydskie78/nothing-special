@@ -9,6 +9,9 @@ use App\Department;
 use App\Division;
 use App\News;
 use App\SubDepartment;
+use App\Product;
+use App\Banner;
+use App\Link;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,11 +19,20 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
 use Yajra\Datatables\Datatables;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\Eloquent\Model;
 
-use App\Product;
 
 class AdminController extends Controller
 {
+    public function BRANCH_API()
+    {
+        $branch = DB::table('ctbranches');
+        return response()->json(['data' => $branch], 200);
+    }
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -29,13 +41,13 @@ class AdminController extends Controller
 
     public function index()
     {
+        // $this->CONVERTFILES();
         $products = Product::all();
-        return view('admin.dashboard',compact('products'));
+        return view('admin.dashboard', compact('products'));
     }
 
     public function brands()
     {
-
         return view('admin.brands');
     }
 
@@ -73,12 +85,27 @@ class AdminController extends Controller
         return view('admin.division');
     }
 
-    public function departmentSub(){
+    public function departmentSub()
+    {
         return view('admin.subDepartment');
     }
 
-//DATABASE INTERACTIONS
+    public function banner()
+    {
+        return view('admin.banner');
+    }
 
+    public function link()
+    {
+        return view('admin.link');
+    }
+
+    public function productarchive()
+    {
+        return view('admin.productarchive');
+    }
+
+    //DATABASE INTERACTIONS
     public function editItem(Request $request)
     {
         $id = explode(',', $request->input('idToBeUpdated'));
@@ -87,9 +114,7 @@ class AdminController extends Controller
             case 'brand_edit':
 
                 $this->validate($request, [
-
                     'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-
                 ]);
 
                 $brand = Brand::whereIn('idBrand', $id);
@@ -100,6 +125,11 @@ class AdminController extends Controller
                     $destinationPath = public_path('assets/img/brands');
                     $image->move($destinationPath, $input['imageFile']);
                     $update = array_merge(['imageFile' => $input['imageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'imageFile']));
+
+                    // create copy in webp
+                    $filename = pathinfo($input['imageFile'], PATHINFO_FILENAME);
+                    $filepath = $destinationPath . '/' . $input['imageFile'];
+                    $this->convertImageToWebP($filepath, $filename, 'brand');
                 } else {
                     $update = $request->except(['_token', 'form_id', 'idToBeUpdated']);
                 }
@@ -108,11 +138,13 @@ class AdminController extends Controller
 
                 break;
             case 'product_edit':
+
                 $this->validate($request, [
-
-                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-
+                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:1048',
                 ]);
+
+                // $request->image('imageFile')->rules('mimes:jpeg,bmp,png,gif,svg,webp');
+
                 $product = Product::whereIn('idProduct', $id);
 
                 if ($request->hasFile('imageFile') && $request->hasFile('feaImageFile')) {
@@ -126,23 +158,29 @@ class AdminController extends Controller
                     $destinationPath = public_path('assets/img/products/featuredImage');
                     $feaImage->move($destinationPath, $input['feaImageFile']);
 
-                    $update = array_merge(['imageFile' => $input['imageFile']],$request->except(['_token', 'form_id', 'idToBeUpdated','imageFile','feaImageFile']));
+                    $filepath = $destinationPath . '/' . $input['imageFile'];
 
-                }else if ($request->hasFile('imageFile')) {
+                    //after the image is uploaded you need to create a copy in webp
+
+                    $update = array_merge(['imageFile' => $input['imageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'imageFile', 'feaImageFile']));
+
+                    $filename = pathinfo($input['imageFile'], PATHINFO_FILENAME);
+                    $filepath = $destinationPath . '/' . $input['imageFile'];
+                    $this->convertImageToWebP($filepath, $filename, 'product');
+                } else if ($request->hasFile('imageFile')) {
                     $image = $request->file('imageFile');
                     $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
                     $destinationPath = public_path('assets/img/products');
                     $image->move($destinationPath, $input['imageFile']);
-                    $update = array_merge(['imageFile' => $input['imageFile']],$request->except(['_token', 'form_id', 'idToBeUpdated','imageFile']));
-                }else if($request->hasFile('feaImageFile')){
+                    $update = array_merge(['imageFile' => $input['imageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'imageFile']));
+                } else if ($request->hasFile('feaImageFile')) {
 
                     $feaImage = $request->file('feaImageFile');
-                    $input['feaImageFile'] = pathinfo($feaImage->getClientOriginalName(),PATHINFO_FILENAME) . '.' . $feaImage->getClientOriginalExtension();
+                    $input['feaImageFile'] = pathinfo($feaImage->getClientOriginalName(), PATHINFO_FILENAME) . '.' . $feaImage->getClientOriginalExtension();
                     $destinationPath = public_path('assets/img/products/featuredImage');
                     $feaImage->move($destinationPath, $input['feaImageFile']);
-                    $update = array_merge(['feaImageFile' => $input['feaImageFile']],$request->except(['_token', 'form_id', 'idToBeUpdated','feaImageFile']));
-
-                }else {
+                    $update = array_merge(['feaImageFile' => $input['feaImageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'feaImageFile']));
+                } else {
                     $update = $request->except(['_token', 'form_id', 'idToBeUpdated']);
                 }
 
@@ -168,8 +206,8 @@ class AdminController extends Controller
                     $destinationPath = public_path('assets/img/news');
 
                     $image->move($destinationPath, $input['imageFile']);
-                    $update = array_merge(['imageFile' => $input['imageFile']],$request->except(['_token', 'form_id', 'idToBeUpdated','imageFile']));
-                }else{
+                    $update = array_merge(['imageFile' => $input['imageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'imageFile']));
+                } else {
                     $update = $request->except(['_token', 'form_id', 'idToBeUpdated']);
                 }
 
@@ -194,36 +232,59 @@ class AdminController extends Controller
                     $destinationPath = public_path('assets/img/branch');
 
                     $image->move($destinationPath, $input['imageFile']);
-                    $branch->imageFile = $input['imageFile'];
-                    $update = array_merge(['imageFile' => $input['imageFile']],$request->except(['_token', 'form_id', 'idToBeUpdated','imageFile']));
-                }else{
+                    $branch->imageFil8e = $input['imageFile'];
+                    $update = array_merge(['imageFile' => $input['imageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'imageFile']));
+                } else {
                     $update = $request->except(['_token', 'form_id', 'idToBeUpdated']);
                 }
 
                 $data = $branch->update($update);
+
                 break;
             case 'career_edit':
-                $this->validate($request, [
 
-                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                try {
+                    $this->validate($request, [
+                        'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                    ]);
 
-                ]);
+                    if (!isHTML($request->desc)) {
+                        $ulMarkup = GenerateUlMarkUp($request->desc);
+                    } else {
+                        $ulMarkup = $request->desc;
+                    }
 
-                if(!isHTML($request->desc)) {
-                    $ulMarkup = GenerateUlMarkUp($request->desc);
-                }else{
-                    $ulMarkup = $request->desc;
+                    //? CATCHING EMPTY ARRAYS
+                    if (empty($request->luzBranchEdit)) {
+                        $request->luzBranchEdit = array();
+                        $request->luzBranchEdit['0'] = "0";
+                    }
+                    if (empty($request->visBranchEdit)) {
+                        $request->visBranchEdit = array();
+                        $request->visBranchEdit['0'] = "0";
+                    }
+                    if (empty($request->minBranchEdit)) {
+                        $request->minBranchEdit = array();
+                        $request->minBranchEdit['0'] = "0";
+                    }
+
+                    $selectedBranches = implode(', ', $request->luzBranchEdit) . ', ' . implode(', ', $request->visBranchEdit) . ', ' . implode(', ', $request->minBranchEdit);
+
+                    $request->merge(['desc' => $ulMarkup]);
+                    $career = Career::whereIn('idJob', $id);
+
+                    $update = $request->except(['_token', 'form_id', 'idToBeUpdated', 'luzBranchEdit', 'visBranchEdit', 'minBranchEdit']);
+                    $update['branchId'] = $selectedBranches;
+
+                    $data = $career->update($update);
+                } catch (\Throwable $th) {
+                    return $th;
                 }
 
-                $request->merge(['desc' => $ulMarkup]);
-                $career = Career::whereIn('idJob', $id);
-                $data = $career->update($request->except(['_token', 'form_id', 'idToBeUpdated']));
                 break;
             case 'division_edit':
                 $this->validate($request, [
-
                     'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-
                 ]);
 
                 $career = Division::whereIn('idDivision', $id);
@@ -231,9 +292,7 @@ class AdminController extends Controller
                 break;
             case 'department_edit':
                 $this->validate($request, [
-
                     'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-
                 ]);
 
                 $career = Department::whereIn('idDepartment', $id);
@@ -248,6 +307,87 @@ class AdminController extends Controller
 
                 $career = SubDepartment::whereIn('id', $id);
                 $data = $career->update($request->except(['_token', 'form_id', 'idToBeUpdated']));
+                break;
+            case 'banner_edit':
+                $banner = Banner::whereIn('bannerid', $id);
+                $update = $request->except(['_token', 'form_id', 'idToBeUpdated', 'bannerimage', 'pagevideo', 'page']);
+
+                $this->validate($request, [
+                    'bannerimage' => 'nullable|image|mimes:jpeg,jpg|max:2048',
+                ]);
+
+                $validator = Validator::make($request->all(), [
+                    'pagevideo' => 'mimetypes:video/mp4|max:10000',
+                ]);
+
+
+                // |dimensions:width=470,height=702'
+
+                // $error = $validator->errors()->first();
+                // $error = $validator->errors();
+
+                // dd($error);
+
+                if ($validator->fails()) {
+                    return response()->json(['error' => 'the filesize of your video is too large'], 200);
+                }
+
+                if ($request->hasFile('pagevideo')) {
+
+                    $image = $request->file('pagevideo');
+
+                    $input['pagevideo'] = $request->page . '.' . $image->getClientOriginalExtension();
+
+                    $destinationPath = public_path('assets/img/banner');
+
+                    $image->move($destinationPath, $input['pagevideo']);
+                    $banner->pagevideo = $input['pagevideo'];
+                    $update = array_merge(['pagevideo' => $input['pagevideo']], $update);
+                }
+
+                if ($request->hasFile('bannerimage')) {
+
+                    $image = $request->file('bannerimage');
+
+                    $input['bannerimage'] = $request->page . '.' . $image->getClientOriginalExtension();
+
+                    $destinationPath = public_path('assets/img/banner');
+
+                    $image->move($destinationPath, $input['bannerimage']);
+                    $banner->bannerimage = $input['bannerimage'];
+                    $update = array_merge(['bannerimage' => $input['bannerimage']], $update);
+
+                    $filename = pathinfo($input['bannerimage'], PATHINFO_FILENAME);
+                    $filepath = $destinationPath . '/' . $input['bannerimage'];
+                    $this->convertImageToWebP($filepath, $filename, 'banner');
+                }
+
+                $data = $banner->update($update);
+                break;
+            case 'link_edit':
+                $link = Link::whereIn('id', $id);
+
+                $update = $request->except(['_token', 'form_id', 'idToBeUpdated']);
+
+                $this->validate($request, [
+                    'image' => 'nullable|image|mimes:jpeg,jpg|max:2048',
+                ]);
+
+                if ($request->hasFile('image')) {
+
+                    $image = $request->file('image');
+                    $input['image'] = time() . '.' . $image->getClientOriginalExtension();
+                    $destinationPath = public_path('assets/img/featured');
+                    $image->move($destinationPath, $input['image']);
+                    $link->image = $input['image'];
+                    $update = array_merge(['image' => $input['image']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'image']));
+
+
+                    $filename = pathinfo($input['imageFile'], PATHINFO_FILENAME);
+                    $filepath = $destinationPath . '/' . $input['imageFile'];
+                    $this->convertImageToWebP($filepath, $filename, 'link');
+                }
+                $data = $link->update($update);
                 break;
             default:
                 return response()->json(['error' => 'Uknown Error!!'], 412);
@@ -275,7 +415,6 @@ class AdminController extends Controller
 
                 if ($request->hasFile('imageFile')) {
 
-
                     $image = $request->file('imageFile');
 
                     $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
@@ -284,6 +423,9 @@ class AdminController extends Controller
 
                     $image->move($destinationPath, $input['imageFile']);
                     $data->imageFile = $input['imageFile'];
+                } else {
+                    // use the file path in the default img
+                    $data->imageFile = "na.webp";
                 }
 
                 $data->save();
@@ -299,24 +441,18 @@ class AdminController extends Controller
                 ]);
 
                 if ($request->hasFile('imageFile')) {
-
-
                     $image = $request->file('imageFile');
-
                     $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
-
                     $destinationPath = public_path('assets/img/products');
-
                     $image->move($destinationPath, $input['imageFile']);
                     $data->imageFile = $input['imageFile'];
                 }
 
                 if ($request->hasFile('feaImageFile')) {
 
-
                     $feaImage = $request->file('feaImageFile');
 
-                    $input['feaImageFile'] = pathinfo($feaImage->getClientOriginalName(),PATHINFO_FILENAME) . '.' . $feaImage->getClientOriginalExtension();
+                    $input['feaImageFile'] = pathinfo($feaImage->getClientOriginalName(), PATHINFO_FILENAME) . '.' . $feaImage->getClientOriginalExtension();
 
                     $destinationPath = public_path('assets/img/products/featuredImage');
 
@@ -337,13 +473,9 @@ class AdminController extends Controller
 
                 if ($request->hasFile('imageFile')) {
 
-
                     $image = $request->file('imageFile');
-
                     $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
-
                     $destinationPath = public_path('assets/img/news');
-
                     $image->move($destinationPath, $input['imageFile']);
                     $data->imageFile = $input['imageFile'];
                 }
@@ -377,25 +509,43 @@ class AdminController extends Controller
             case 'career_add':
 
                 $ulMarkup = GenerateUlMarkUp($request->desc);
-
                 $request->merge(['desc' => $ulMarkup]);
-
-                $career = Career::where('catId',$request['catID'])->orderBy('dbstat','DESC')->first();
+                $career = Career::where('catId', $request['catID'])->orderBy('dbstat', 'DESC')->first();
                 $dbstat = $career->dbstat++;
-
                 $data = new Career();
                 $data->dbstat = $dbstat;
-                $data->fill($request->except(['_token', 'form_id']));
+                $data->fill($request->except(['_token', 'form_id', 'branchId']));
                 $this->validate($request, [
-
                     'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-
                 ]);
+
+                //? CATCHING EMPTY ARRAYS
+                if (empty($request->luzBranch)) {
+                    $request->luzBranch = array();
+                    $request->luzBranch['0'] = "0";
+                }
+                if (empty($request->visBranch)) {
+                    $request->visBranch = array();
+                    $request->visBranch['0'] = "0";
+                }
+                if (empty($request->minBranch)) {
+                    $request->minBranch = array();
+                    $request->minBranch['0'] = "0";
+                }
+
+                $data->branchId = implode(',', $request->luzBranch) . ',' . implode(',', $request->visBranch) . ',' . implode(',', $request->minBranch);
+
+                // dd($data);
+
+                if ($request->input('branchId')) {
+                    $data->branchId =   implode(",", $request->input('branchId'));
+                }
+
                 $data->save();
                 break;
             case 'division_add':
                 $data = new Division();
-                $data->fill($request->except(['_token', 'form_id','EBSid']));
+                $data->fill($request->except(['_token', 'form_id', 'EBSid']));
                 $this->validate($request, [
 
                     'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -405,7 +555,7 @@ class AdminController extends Controller
                 break;
             case 'department_add':
                 $data = new Department();
-                $data->fill($request->except(['_token', 'form_id','EBSid']));
+                $data->fill($request->except(['_token', 'form_id', 'EBSid']));
                 $this->validate($request, [
 
                     'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -415,7 +565,7 @@ class AdminController extends Controller
                 break;
             case 'subDepartment_add':
                 $data = new SubDepartment();
-                $data->fill($request->except(['_token', 'form_id','EBSid']));
+                $data->fill($request->except(['_token', 'form_id', 'EBSid']));
                 $this->validate($request, [
 
                     'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -434,39 +584,142 @@ class AdminController extends Controller
         }
     }
 
-    public function db_delete(Request $request)
+    public function db_restore(Request $request)
     {
-        $rows = explode(',',$request->input('rows'));
-        $imagePath = public_path().'/assets/img/';
+        $rows = explode(',', $request->input('rows'));
         switch ($request->input('table')) {
             case 'brand_table':
-                $imageRows = Brand::whereIn('idBrand',$rows)->pluck('imageFile');
-                foreach ($imageRows as $image){
-                    $file = File::delete($imagePath.'brands/'.$image);
+
+                break;
+            case 'product_table':
+
+                break;
+            case 'productsarchive_table':
+                $data = Product::onlyTrashed()->whereIn('idProduct', $rows)->restore();
+                break;
+
+            case 'news_table':
+
+                break;
+            case 'branch_table':
+
+                break;
+            case 'career_table':
+
+                break;
+            case 'division_table':
+
+                break;
+            case 'department_table':
+
+                break;
+            case 'subDepartment_table':
+
+                break;
+            default:
+                return response()->json(['error' => 'Uknown Error!!'], 412);
+        }
+
+        if ($data == null) {
+            return response()->json(['error' => $data], 412);
+        } else {
+            return response()->json('success', 200);
+        }
+    }
+
+    public function db_harddelete(Request $request)
+    {
+
+        $rows = explode(',', $request->input('rows'));
+        $imagePath = public_path() . '/assets/img/';
+        switch ($request->input('table')) {
+            case 'brand_table':
+                $imageRows = Brand::whereIn('idBrand', $rows)->pluck('imageFile');
+                foreach ($imageRows as $image) {
+                    $file = File::delete($imagePath . 'brands/' . $image);
+                }
+
+                $data = Brand::forceDelete($rows);
+                break;
+            case 'productsarchive_table':
+                // $imageRows = Product::whereIn('idProduct',$rows)->get(['imageFile','feaImageFile']);
+                // foreach ($imageRows as $image){
+                //     $file = File::delete($imagePath.'products/'.$image->imageFile);
+                //     $feaFile = File::delete($imagePath.'products/featuredImage/'.$image->feaImageFile);
+                // }
+                $data = Product::onlyTrashed()->whereIn('idProduct', $rows)->forceDelete();
+                break;
+            case 'news_table':
+                $imageRows = News::whereIn('idNews', $rows)->pluck('imageFile');
+                foreach ($imageRows as $image) {
+                    $file = File::delete($imagePath . 'news/' . $image);
+                }
+                $data = News::forceDelete($rows);
+                break;
+            case 'branch_table':
+                $imageRows = Branch::whereIn('idBranch', $rows)->pluck('imageFile');
+                foreach ($imageRows as $image) {
+                    $file = File::delete($imagePath . 'branch/' . $image);
+                }
+                $data = Branch::forceDelete($rows);
+                break;
+            case 'career_table':
+                $data = Career::forceDelete($rows);
+                break;
+            case 'division_table':
+                $data = Division::forceDelete($rows);
+                break;
+            case 'department_table':
+                $data = Department::forceDelete($rows);
+                break;
+            case 'subDepartment_table':
+                $data = SubDepartment::forceDelete($rows);
+                break;
+            default:
+                return response()->json(['error' => 'Uknown Error!!'], 412);
+        }
+
+        if ($data == null) {
+            return response()->json(['error' => $data], 412);
+        } else {
+            return response()->json('success', 200);
+        }
+    }
+
+    public function db_delete(Request $request)
+    {
+        $rows = explode(',', $request->input('rows'));
+        $imagePath = public_path() . '/assets/img/';
+        switch ($request->input('table')) {
+            case 'brand_table':
+                $imageRows = Brand::whereIn('idBrand', $rows)->pluck('imageFile');
+                foreach ($imageRows as $image) {
+                    $file = File::delete($imagePath . 'brands/' . $image);
                 }
 
                 $data = Brand::destroy($rows);
                 break;
             case 'product_table':
-                $imageRows = Product::whereIn('idProduct',$rows)->get(['imageFile','feaImageFile']);
+                $imageRows = Product::whereIn('idProduct', $rows)->get(['imageFile', 'feaImageFile']);
 
-                foreach ($imageRows as $image){
-                    $file = File::delete($imagePath.'products/'.$image->imageFile);
-                    $feaFile = File::delete($imagePath.'products/featuredImage/'.$image->feaImageFile);
+                foreach ($imageRows as $image) {
+                    $file = File::delete($imagePath . 'products/' . $image->imageFile);
+                    $feaFile = File::delete($imagePath . 'products/featuredImage/' . $image->feaImageFile);
                 }
+
                 $data = Product::destroy($rows);
                 break;
             case 'news_table':
-                $imageRows = News::whereIn('idNews',$rows)->pluck('imageFile');
-                foreach ($imageRows as $image){
-                    $file = File::delete($imagePath.'news/'.$image);
+                $imageRows = News::whereIn('idNews', $rows)->pluck('imageFile');
+                foreach ($imageRows as $image) {
+                    $file = File::delete($imagePath . 'news/' . $image);
                 }
                 $data = News::destroy($rows);
                 break;
             case 'branch_table':
-                $imageRows = Branch::whereIn('idBranch',$rows)->pluck('imageFile');
-                foreach ($imageRows as $image){
-                    $file = File::delete($imagePath.'branch/'.$image);
+                $imageRows = Branch::whereIn('idBranch', $rows)->pluck('imageFile');
+                foreach ($imageRows as $image) {
+                    $file = File::delete($imagePath . 'branch/' . $image);
                 }
                 $data = Branch::destroy($rows);
                 break;
@@ -491,7 +744,6 @@ class AdminController extends Controller
         } else {
             return response()->json('success', 200);
         }
-
     }
 
     public function ajaxData($table)
@@ -502,6 +754,36 @@ class AdminController extends Controller
                 break;
             case 'products':
                 $model = Product::query();
+                // $model = Product::query()->take(10)->get();
+
+                return DataTables::of($model)
+                    ->addColumn('brandName', function (Product $product) {
+                        $brand = Brand::where('idBrand', $product->idBrand)->first();
+                        if ($brand === null) {
+                            return 'No Brand';
+                        } else {
+                            return $brand->brandName;
+                        }
+                    })->addColumn('parent', function (Product $product) {
+                        $parent = Division::where('idDivision', $product->idParent)->first();
+                        if ($parent === null) {
+                            return 'NULL';
+                        } else {
+                            return $parent->Division;
+                        }
+                    })->addColumn('subParent', function (Product $product) {
+                        $subParent = Department::where('idDepartment', $product->idSub)->first();
+                        if ($subParent === null) {
+                            return 'NULL';
+                        } else {
+                            return $subParent->Department;
+                        }
+                    })
+                    ->make(true);
+                break;
+            case 'productsarchive':
+
+                $model = Product::onlyTrashed();
 
                 return DataTables::of($model)
                     ->addColumn('brandName', function (Product $product) {
@@ -527,12 +809,13 @@ class AdminController extends Controller
                         }
                     })
                     ->make(true);
+
                 break;
             case 'news':
 
                 $news = News::query();
                 return DataTables::of($news)
-                    ->addColumn('date_posted',function ($data){
+                    ->addColumn('date_posted', function ($data) {
 
                         return $data->created_at->format('F d, Y');
                     })
@@ -542,10 +825,9 @@ class AdminController extends Controller
                 $db_table = 'ctbranches';
                 break;
             case 'careers':
-
                 $careers = Career::with('jobcategory');
                 return Datatables::of($careers)
-                    ->addColumn('job_category',function($data){
+                    ->addColumn('job_category', function ($data) {
                         return $data->jobcategory->name;
                     })
                     ->make(true);
@@ -553,22 +835,31 @@ class AdminController extends Controller
             case 'departments':
                 $department = Department::with('division');
                 return Datatables::of($department)
-                    ->addColumn('equi_division',function($data){
+                    ->addColumn('equi_division', function ($data) {
                         return $data->division['Division'];
                     })
                     ->make(true);
+                break;
+            case 'link':
+                // $link = DB::table('ctlinks')->select('id','image','desc')>where('status', 1)->get();
+                $link = Link::query();
+                return Datatables::of($link)->make(true);
                 break;
             case 'divisions':
                 $db_table = 'ctdivision';
                 break;
             case 'subDepartments';
-                $subDeparment = SubDepartment::select('ctdepartment.idDepartment as department_id','ctdepartment.Department','department_sub.departmentSubName','department_sub.status','department_sub.id')->
-                    leftJoin('ctdepartment','department_sub.idDepartment','=','ctdepartment.idDepartment')->get();
+                $subDeparment = SubDepartment::select('ctdepartment.idDepartment as department_id', 'ctdepartment.Department', 'department_sub.departmentSubName', 'department_sub.status', 'department_sub.id')->leftJoin('ctdepartment', 'department_sub.idDepartment', '=', 'ctdepartment.idDepartment')->get();
 
-              return Datatables::of($subDeparment)
-                    ->addColumn('category_name',function($data){
+                return Datatables::of($subDeparment)
+                    ->addColumn('category_name', function ($data) {
                         return $data->Department;
                     })
+                    ->make(true);
+                break;
+            case 'banner':
+                $banner = Banner::query();
+                return DataTables::of($banner)
                     ->make(true);
                 break;
             default:
@@ -582,13 +873,17 @@ class AdminController extends Controller
     {
         $form_id = $request->input('btn_id');
 
+        // dd($form_id);
+        // return;
+
+        // dd($request->all());
+
         $id = explode(',', $request->input('rows'));
         if (count($id) == 1) {
             $id_update = $request->input('rows');
         } else {
             return view('admin.ajax.modalMultiEdit', ['data' => $request->input('rows'), 'form_id' => $form_id]);
         }
-
 
         switch ($form_id) {
             case 'brand_edit':
@@ -615,12 +910,17 @@ class AdminController extends Controller
             case 'subDepartment_edit':
                 $data = SubDepartment::find($id_update);
                 break;
+            case 'banner_edit':
+                $data = Banner::find($id_update);
+                break;
+            case 'link_edit':
+                $data = Link::find($id_update);
+                break;
             default:
                 return false;
         }
 
         return view('admin.ajax.modalEdit', ['data' => $data, 'form_id' => $form_id]);
-
     }
 
     public function modalAdd(Request $request)
@@ -628,5 +928,100 @@ class AdminController extends Controller
         $form_id = $request->input('btn_id');
 
         return view('admin.ajax.modalAdd', ['form_id' => $form_id]);
+    }
+    //Additional functions Aug 28, 2019 dev: Pit
+
+    public function imageUploadPost(Request $request)
+    {
+        if ($request->hasFile('imageFile')) {
+
+            //check if the file is png ,dimension and file size
+            $validator = Validator::make($request->all(), [
+                'imageFile' => 'required|image|mimes:png,svg|max:1048|dimensions:width=470,height=702'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => 'Invalid dimension or file type'], 200);
+            }
+
+            $image = $request->file('imageFile');
+            $input['imageFile'] = 'map.' . $image->getClientOriginalExtension();
+            $destinationPath = public_path('assets/img/');
+            $image->move($destinationPath, $input['imageFile']);
+            return response()->json(['success' => 'Edited'], 200);
+            return view('admin.ajax.modalSetmap');
+        } else {
+            return response()->json(['error' => 'There is no file selected'], 200);
+        }
+    }
+
+    public function setXY(Request $request)
+    {
+        $id = $request->id;
+        $result = DB::table('ctbranches')->where('idBranch', $id)->first();
+        return view('admin.ajax.modalMap', ['tooltipx' => $request->tooltipx, 'tooltipy' => $request->tooltipy, 'id' => $result->idBranch, 'branch' => $result->branchName]);
+    }
+
+    public function modalMap(Request $request)
+    {
+        $id = $request->id;
+
+        $result = DB::table('ctbranches')->where('idBranch', $id)->first();
+        // dd($result);
+        return view('admin.ajax.modalMap', ['tooltipx' => $result->tooltipx, 'tooltipy' => $result->tooltipy, 'id' => $result->idBranch, 'branch' => $result->branchName]);
+    }
+
+    public function SAVE_TOOLTIP(Request $request)
+    {
+        Branch::where('idBranch', $request->id)->update(array('tooltipx' => $request->tooltipx, 'tooltipy' => $request->tooltipy));
+        return response()->json(['success' => 'Edited'], 200);
+    }
+
+    public function setMap(Request $request)
+    {
+        return view('admin.ajax.modalSetmap');
+    }
+
+    public function convertImageToWebP($source, $destinationfile, $module, $quality = 70)
+    {
+
+        // $source = asset('assets/img/banner/Home.jpg');
+        $image = '';
+
+        if ($module === 'product') {
+            $destination = public_path('assets/img/productwebp/');
+        } else if ($module === 'brand') {
+            $destination = public_path('assets/img/brandwebp/');
+        } else if ($module === 'link') {
+            $destination = public_path('assets/img/featuredwebp/');
+        } else if ($module === 'banner') {
+            $destination = public_path('assets/img/bannerwebp/');
+        }
+
+        // $destination = asset('assets/img/webp');
+        $extension = pathinfo($source, PATHINFO_EXTENSION);
+
+        if ($extension == 'jpeg' || $extension == 'jpg')
+            $image = imagecreatefromjpeg($source);
+        elseif ($extension == 'gif')
+            $image = imagecreatefromgif($source);
+        elseif ($extension == 'png')
+            $image = imagecreatefrompng($source);
+
+        // , $destination.'Branches.webp'
+        return imagewebp($image, $destination . $destinationfile . '.webp', $quality);
+    }
+
+    public function CONVERTFILES()
+    {
+        $path = public_path('assets/img/featured');
+        $files = File::files($path);
+
+        foreach ($files as $file) {
+            $filefrom = pathinfo(basename($file), PATHINFO_FILENAME);
+            $filename = basename($filefrom);
+            // $this->convertImageToWebP($file,$filename);
+            // dd($file);
+        }
     }
 }

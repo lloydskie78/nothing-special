@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Branch extends Model
 {
+    //changes Aug 28, 2019 dev: Pit
+    //$fillable addded tooltipx,tooltipy
+
     protected $table = 'ctbranches';
     protected $primaryKey = 'idBranch';
     protected $fillable = [
@@ -19,6 +22,13 @@ class Branch extends Model
         'storeHours',
         'imageFile',
         'latlng',
-        'status'
+        'status',
+        'tooltipx',
+        'tooltipy'
     ];
+
+    public function scopeBranchAscending($query)
+    {
+        return $query->orderBy('branchName', 'asc');
+    }
 }

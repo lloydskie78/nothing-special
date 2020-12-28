@@ -61,7 +61,12 @@
                     },
                     {
                         data: 'imageFile', render: function (data) {
-                            return '<img src="../assets/img/brands/' + data + '" class="img-fluid">';
+                            if(data === null){
+                                return '<img src="../assets/img/defaultimg/' + "na.png"+'" class="img-fluid" >';
+                            }
+                            else{
+                                return '<img src="../assets/img/brands/' + data + '" class="img-fluid" >';
+                            }
                         }
                     }
                 ], "columnDefs": [{

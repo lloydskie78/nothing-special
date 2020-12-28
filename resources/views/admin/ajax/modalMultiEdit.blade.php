@@ -37,13 +37,18 @@
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group col-6">
+                <div class="form-group col-4">
                     {{Form::label('Featured')}}
                     {{Form::select('isfeatured', [0 => 'Not Featured', 1 => 'Featured'], "",['class' => 'custom-select custom-select-sm','placeholder' => 'Choose..'])}}
                 </div>
-                <div class="form-group col-6">
+                <div class="form-group col-4">
                     {{Form::label('Availability')}}
-                    {{Form::select('availability', [0 => 'Not Available', 1 => 'Avaialble'], "",['class' => 'custom-select custom-select-sm','placeholder' => 'Choose Availability'])}}
+                    {{Form::select('availability', [0 => 'Not Available', 1 => 'Available'], "",['class' => 'custom-select custom-select-sm','placeholder' => 'Choose Availability'])}}
+                </div>
+
+                <div class="form-group col-4">
+                    {{Form::label('Show Product')}}
+                    {{Form::select('showProduct', [0 => 'Hide', 1 => 'Show'], null,['class' => 'custom-select custom-select-sm'])}}
                 </div>
             </div>
             {{Form::button('Save',['type' => 'submit','class'=>'btn btn-primary'])}}

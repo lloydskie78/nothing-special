@@ -8,8 +8,19 @@ class Career extends Model
 {
     protected $table = 'ctcareers';
     protected $primaryKey = 'idJob';
+    protected $attributes = [
+        'branchId' => '0',
+        'luzon' => 'NOT SET',
+        'visayas' => 'NOT SET',
+        'mindanao' => 'NOT SET',
+    ];
+
     protected $fillable = [
         'jobTitle',
+        'branchId',
+        'luzon',
+        'visayas',
+        'mindanao',
         'catID',
         'desc',
         'status',
@@ -20,3 +31,5 @@ class Career extends Model
         return $this->hasOne('App\JobCategory','id','catID');
     }
 }
+
+        // 'branchName',

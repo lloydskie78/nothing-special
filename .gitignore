@@ -4,6 +4,7 @@
 /public
 /public/hot
 /public/storage
+.public/assets/img/products
 /vendor
 /.idea
 /.vscode

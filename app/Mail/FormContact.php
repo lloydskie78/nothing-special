@@ -36,7 +36,8 @@ class FormContact extends Mailable
     public function build()
     {
         return $this->from($this->email,$this->name)
-            ->subject('Contact')
+            ->replyTo($this->email, $this->name)
+            ->subject($this->name.' inquiry from Citihardware Website')
             ->view('emails.contact')
             ->with(['sender' => $this->name,'emailcontent' => $this->emailcontent]);
     }

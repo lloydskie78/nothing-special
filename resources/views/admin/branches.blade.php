@@ -9,6 +9,8 @@
         <div class="mb-2">
             <button data-btn='branch_add' type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-modal="add" data-target="#myModal">Add Branch</button>
             <button type="button" class="btn btn-primary btn-sm btn_edit" data-btn="branch_edit" data-modal="edit">Edit Branch/'s</button>
+            <button data-btn='branch_map' type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-modal="map">Set tool tip</button>
+            <button data-btn='branch_map' type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-modal="editmap">Update Map</button>
             <button type="button" class="btn btn-danger btn-sm btn_delete" >Delete Branch/'s</button>
         </div>
         <table class='table table-bordered table-hover display table-sm' id='branch_table'>

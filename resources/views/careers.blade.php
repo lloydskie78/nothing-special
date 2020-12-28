@@ -1,5 +1,5 @@
 @extends('layouts.master')
-@section('bg-img',asset('assets/img/header-sliders/revised.jpg'))
+@section('bg-img',asset('assets/img/imgwebp/Careers.webp'))
 @section('content')
 
 <div class="carcontent col-10 pageContent">
@@ -8,7 +8,7 @@
             <a href='javascript:void();' class='hvr-float jobcat' data-id='{{$cat->id}}'>{{$cat->name}}</a>
         @endforeach
     </div>
-    <h1 class="cartitle mtop">Store Support</h1>
+    <h1 class="cartitle mtop">Store Support (Davao Based)</h1>
     <div class="carbdy"></div>
     <div class="carfootr">
         <div class="requirements">
@@ -29,4 +29,4 @@
         </div>
     </div>
 </div>
-@endsection
+@endsection 
