@@ -30,7 +30,6 @@ class AppServiceProvider extends ServiceProvider
         $vis = DB::table('ctbranches')->where('islandGroup', 2)->orderBy('branchName', 'asc')->get();
         $min = DB::table('ctbranches')->where('islandGroup', 3)->orderBy('branchName', 'asc')->get();
         $branches = DB::table('ctbranches')->orderBy('branchName', 'asc')->get();
-        $branchesCount = DB::table('ctbranches')->get();
         $branchesCount = DB::table('ctbranches')->count();
         $brandSpecific = Brand::select('idBrand', 'brandName', 'imageFile')->where('brandName', 'LIKE', '%La Fonza%')
             ->orWhere('brandName', 'LIKE', '%Boston Bay%')
@@ -55,7 +54,7 @@ class AppServiceProvider extends ServiceProvider
             ->orWhere('brandName', 'LIKE', '%Einhell%')
             ->orWhere('brandName', 'LIKE', '%Werner%')
             ->get();
-
+        $wall_and_floor = SubDepartment::where('idDepartment', 75)->get();
         $categories = Division::where('division_status', 1)->orderBy('Division', 'asc')->with('subcategories')->get();
         $brands = Brand::where('status', 1)->get();
         $select_branch = selectArray(Branch::BranchAscending()->where('status', '1')->orderBy('branchName', 'ASC')->get(), 'branchName', 'idBranch');
@@ -94,7 +93,7 @@ class AppServiceProvider extends ServiceProvider
             'brands' => $brands,
             'branchesCount' => $branchesCount,
             'brandSpecific' => $brandSpecific,
-
+            'wall_and_floor' => $wall_and_floor,
         ]);
     }
 

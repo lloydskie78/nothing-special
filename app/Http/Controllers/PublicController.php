@@ -95,6 +95,7 @@ class PublicController extends Controller
     public function products(Request $request)
     {
 
+
         $first_department_id = Division::with('subcategories')
             ->orderBy('Division', 'asc')
             ->first()->subcategories
@@ -166,9 +167,11 @@ class PublicController extends Controller
     public function productPerCat(Request $request, $category, $department)
     {
 
+        $search = preg_replace('/[+\-><\(\)~*\"@]+/', ' ', $request->search);
+        $subdepartmentsearch = str_replace(' ', '', $request->search);
+
         if ($request->has('search')) {
-            $search = preg_replace('/[+\-><\(\)~*\"@]+/', ' ', $request->search);
-            $subdepartmentsearch = str_replace(' ', '', $request->search);
+            
             $products = Product::select('ctproducts.idProduct', 'ctproducts.idSub', 'ctproducts.details', 'ctproducts.imageFile', 'ctbrands.imageFile as brandImageFile', 'ctbrands.brandName', 'department_sub.departmentSubName', 'ctproducts.prodName', 'ctdepartment.Department', 'ctdivision.Division')
                 ->selectRaw("MATCH ({$request->fieldtofilter}) AGAINST (?) AS relevance", array($search))
                 ->leftJoin('ctbrands', 'ctproducts.idBrand', '=', 'ctbrands.idBrand')

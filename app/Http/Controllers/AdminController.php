@@ -2,27 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Branch;
-use App\Brand;
-use App\Career;
-use App\Department;
-use App\Division;
-use App\News;
-use App\SubDepartment;
-use App\Product;
-use App\Banner;
 use App\Link;
+use App\News;
+use App\User;
+use App\Brand;
+use App\Banner;
+use App\Branch;
+use App\Career;
+use App\Product;
+use App\Division;
 use Carbon\Carbon;
+use App\Department;
+use App\SubDepartment;
 use Illuminate\Http\Request;
+use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Storage;
-use Yajra\Datatables\Datatables;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Input;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 
 class AdminController extends Controller
@@ -43,7 +44,9 @@ class AdminController extends Controller
     {
         // $this->CONVERTFILES();
         $products = Product::all();
-        return view('admin.dashboard', compact('products'));
+        $users = User::all();
+
+        return view('admin.dashboard', compact('products', 'users'));
     }
 
     public function brands()
@@ -1023,5 +1026,19 @@ class AdminController extends Controller
             // $this->convertImageToWebP($file,$filename);
             // dd($file);
         }
+    }
+
+    public function departmentSelect(Request $request)
+    {
+        $dept = Department::where('idDivision', $request->division)->get();
+
+        return json_encode(['department' => $dept]);
+    }
+
+    public function subDepartmentSelect(Request $request)
+    {
+        $subDept = SubDepartment::where('idDepartment', $request->subDepartment)->get();
+
+        return json_encode(['subDepartment' => $subDept]);
     }
 }

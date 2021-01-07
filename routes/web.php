@@ -88,4 +88,9 @@ Route::prefix('admin')->group(function () {
     Route::post('setxy', 'AdminController@setXY');
     Route::post('setTooltip', 'AdminController@SAVE_TOOLTIP');
     Route::post('image-upload', 'AdminController@imageUploadPost')->name('image.upload.post');
+
+
+    //For product department & sub-department auto select
+    Route::post('getDepartment', 'AdminController@departmentSelect');
+    Route::post('getSubDepartment', 'AdminController@subDepartmentSelect');
 });
