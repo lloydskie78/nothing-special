@@ -73,7 +73,6 @@ class AppServiceProvider extends ServiceProvider
         // $select_subDepartments=array_merge($select_subDepartments,array('' => 'Please Select'));
         // $select_departments=array_merge($select_subDepartments,array('' => 'Please Select'));
 
-
         View::share([
             'luz' => $luz,
             'vis' => $vis,

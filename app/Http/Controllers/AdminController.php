@@ -116,10 +116,6 @@ class AdminController extends Controller
         switch ($request->input('form_id')) {
             case 'brand_edit':
 
-                $this->validate($request, [
-                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                ]);
-
                 $brand = Brand::whereIn('idBrand', $id);
 
                 if ($request->hasFile('imageFile')) {
@@ -141,53 +137,54 @@ class AdminController extends Controller
 
                 break;
             case 'product_edit':
+                try {
 
-                $this->validate($request, [
-                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:1048',
-                ]);
+                    $product = Product::whereIn('idProduct', $id);
 
-                // $request->image('imageFile')->rules('mimes:jpeg,bmp,png,gif,svg,webp');
+                    if ($request->hasFile('imageFile') && $request->hasFile('feaImageFile')) {
+                        $image = $request->file('imageFile');
+                        $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
+                        $destinationPath = public_path('assets/img/products');
+                        $image->move($destinationPath, $input['imageFile']);
 
-                $product = Product::whereIn('idProduct', $id);
+                        $feaImage = $request->file('feaImageFile');
+                        $input['feaImageFile'] = $feaImage->getClientOriginalName() . '.' . $feaImage->getClientOriginalExtension();
+                        $destinationPath = public_path('assets/img/products/featuredImage');
+                        $feaImage->move($destinationPath, $input['feaImageFile']);
 
-                if ($request->hasFile('imageFile') && $request->hasFile('feaImageFile')) {
-                    $image = $request->file('imageFile');
-                    $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
-                    $destinationPath = public_path('assets/img/products');
-                    $image->move($destinationPath, $input['imageFile']);
+                        $filepath = $destinationPath . '/' . $input['imageFile'];
 
-                    $feaImage = $request->file('feaImageFile');
-                    $input['feaImageFile'] = $feaImage->getClientOriginalName() . '.' . $feaImage->getClientOriginalExtension();
-                    $destinationPath = public_path('assets/img/products/featuredImage');
-                    $feaImage->move($destinationPath, $input['feaImageFile']);
+                        //after the image is uploaded you need to create a copy in webp
 
-                    $filepath = $destinationPath . '/' . $input['imageFile'];
+                        $update = array_merge(['imageFile' => $input['imageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'imageFile', 'feaImageFile']));
 
-                    //after the image is uploaded you need to create a copy in webp
+                        $filename = pathinfo($input['imageFile'], PATHINFO_FILENAME);
+                        $filepath = $destinationPath . '/' . $input['imageFile'];
+                        $this->convertImageToWebP($filepath, $filename, 'product');
+                    } else if ($request->hasFile('imageFile')) {
+                        $image = $request->file('imageFile');
+                        $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
+                        $destinationPath = public_path('assets/img/products');
+                        $image->move($destinationPath, $input['imageFile']);
+                        $update = array_merge(['imageFile' => $input['imageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'imageFile']));
+                    } else if ($request->hasFile('feaImageFile')) {
 
-                    $update = array_merge(['imageFile' => $input['imageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'imageFile', 'feaImageFile']));
+                        $feaImage = $request->file('feaImageFile');
+                        $input['feaImageFile'] = pathinfo($feaImage->getClientOriginalName(), PATHINFO_FILENAME) . '.' . $feaImage->getClientOriginalExtension();
+                        $destinationPath = public_path('assets/img/products/featuredImage');
+                        $feaImage->move($destinationPath, $input['feaImageFile']);
+                        $update = array_merge(['feaImageFile' => $input['feaImageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'feaImageFile']));
+                    } else {
+                        $update = $request->except(['_token', 'form_id', 'idToBeUpdated']);
+                    }
 
-                    $filename = pathinfo($input['imageFile'], PATHINFO_FILENAME);
-                    $filepath = $destinationPath . '/' . $input['imageFile'];
-                    $this->convertImageToWebP($filepath, $filename, 'product');
-                } else if ($request->hasFile('imageFile')) {
-                    $image = $request->file('imageFile');
-                    $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
-                    $destinationPath = public_path('assets/img/products');
-                    $image->move($destinationPath, $input['imageFile']);
-                    $update = array_merge(['imageFile' => $input['imageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'imageFile']));
-                } else if ($request->hasFile('feaImageFile')) {
+                    // dd($update);
 
-                    $feaImage = $request->file('feaImageFile');
-                    $input['feaImageFile'] = pathinfo($feaImage->getClientOriginalName(), PATHINFO_FILENAME) . '.' . $feaImage->getClientOriginalExtension();
-                    $destinationPath = public_path('assets/img/products/featuredImage');
-                    $feaImage->move($destinationPath, $input['feaImageFile']);
-                    $update = array_merge(['feaImageFile' => $input['feaImageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'feaImageFile']));
-                } else {
-                    $update = $request->except(['_token', 'form_id', 'idToBeUpdated']);
+                    $data = $product->update($update);
+                } catch (\Throwable $th) {
+                    return $th;
                 }
 
-                $data = $product->update($update);
                 break;
             case 'news_edit':
 
@@ -286,32 +283,24 @@ class AdminController extends Controller
 
                 break;
             case 'division_edit':
-                $this->validate($request, [
-                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                ]);
 
                 $career = Division::whereIn('idDivision', $id);
                 $data = $career->update($request->except(['_token', 'form_id', 'idToBeUpdated']));
                 break;
+
             case 'department_edit':
-                $this->validate($request, [
-                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                ]);
 
                 $career = Department::whereIn('idDepartment', $id);
                 $data = $career->update($request->except(['_token', 'form_id', 'idToBeUpdated']));
                 break;
+
             case 'subDepartment_edit':
-                $this->validate($request, [
-
-                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-
-                ]);
 
                 $career = SubDepartment::whereIn('id', $id);
                 $data = $career->update($request->except(['_token', 'form_id', 'idToBeUpdated']));
                 break;
             case 'banner_edit':
+
                 $banner = Banner::whereIn('bannerid', $id);
                 $update = $request->except(['_token', 'form_id', 'idToBeUpdated', 'bannerimage', 'pagevideo', 'page']);
 
@@ -407,64 +396,71 @@ class AdminController extends Controller
     {
         switch ($request->input('form_id')) {
             case 'brand_add':
+                try {
 
-                $data = new Brand();
-                $data->fill($request->except(['_token', 'form_id']));
-                $this->validate($request, [
+                    $data = new Brand();
+                    $data->fill($request->except(['_token', 'form_id']));
 
-                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                    if ($request->hasFile('imageFile')) {
+                        // return 'Hello World';
+                        $image = $request->file('imageFile');
 
-                ]);
+                        $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
 
-                if ($request->hasFile('imageFile')) {
+                        $destinationPath = public_path('assets/img/brands');
 
-                    $image = $request->file('imageFile');
+                        $image->move($destinationPath, $input['imageFile']);
+                        $data->imageFile = $input['imageFile'];
+                    } else {
+                        // use the file path in the default img
+                        $data->imageFile = "na.webp";
+                    }
 
-                    $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
 
-                    $destinationPath = public_path('assets/img/brands');
-
-                    $image->move($destinationPath, $input['imageFile']);
-                    $data->imageFile = $input['imageFile'];
-                } else {
-                    // use the file path in the default img
-                    $data->imageFile = "na.webp";
+                    $data->save();
+                } catch (\Throwable $th) {
+                    return $th;
                 }
-
-                $data->save();
 
                 break;
             case 'product_add':
-                $data = new Product();
-                $data->fill($request->except(['_token', 'form_id']));
-                $this->validate($request, [
 
-                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                try {
+                    $data = new Product();
+                    $data->fill($request->except(['_token', 'form_id']));
 
-                ]);
+                    if ($request->hasFile('imageFile')) {
 
-                if ($request->hasFile('imageFile')) {
-                    $image = $request->file('imageFile');
-                    $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
-                    $destinationPath = public_path('assets/img/products');
-                    $image->move($destinationPath, $input['imageFile']);
-                    $data->imageFile = $input['imageFile'];
+                        $image = $request->file('imageFile');
+
+                        $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
+
+                        $destinationPath = public_path('assets/img/products');
+
+                        $image->move($destinationPath, $input['imageFile']);
+
+                        $data->imageFile = $input['imageFile'];
+                    }
+
+                    if ($request->hasFile('feaImageFile')) {
+
+                        $feaImage = $request->file('feaImageFile');
+
+                        $input['feaImageFile'] = pathinfo($feaImage->getClientOriginalName(), PATHINFO_FILENAME) . '.' . $feaImage->getClientOriginalExtension();
+
+                        $destinationPath = public_path('assets/img/products/featuredImage');
+
+                        $feaImage->move($destinationPath, $input['feaImageFile']);
+                        $data->feaImageFile = $input['feaImageFile'];
+                    }
+
+                    $data->save();
+                } catch (\Throwable $th) {
+                    return $th;
                 }
 
-                if ($request->hasFile('feaImageFile')) {
-
-                    $feaImage = $request->file('feaImageFile');
-
-                    $input['feaImageFile'] = pathinfo($feaImage->getClientOriginalName(), PATHINFO_FILENAME) . '.' . $feaImage->getClientOriginalExtension();
-
-                    $destinationPath = public_path('assets/img/products/featuredImage');
-
-                    $feaImage->move($destinationPath, $input['feaImageFile']);
-                    $data->feaImageFile = $input['feaImageFile'];
-                }
-
-                $data->save();
                 break;
+
             case 'news_add':
                 $data = new News();
                 $data->fill($request->except(['_token', 'form_id']));
@@ -509,7 +505,9 @@ class AdminController extends Controller
 
                 $data->save();
                 break;
+
             case 'career_add':
+
 
                 $ulMarkup = GenerateUlMarkUp($request->desc);
                 $request->merge(['desc' => $ulMarkup]);
@@ -940,7 +938,7 @@ class AdminController extends Controller
 
             //check if the file is png ,dimension and file size
             $validator = Validator::make($request->all(), [
-                'imageFile' => 'required|image|mimes:png,svg|max:1048|dimensions:width=470,height=702'
+                'imageFile' => 'nullable|image|mimes:png,svg|max:1048|dimensions:width=470,height=702'
             ]);
 
             if ($validator->fails()) {

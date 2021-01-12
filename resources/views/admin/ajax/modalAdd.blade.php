@@ -1,6 +1,7 @@
 @switch($form_id)
 @case('brand_add')
 {{ Form::open(['method' => 'POST', 'class' => 'modal_form', 'id' => 'brand_form', 'files' => true]) }}
+@csrf
 {{ Form::hidden('form_id', 'brand_add') }}
 {{--<div class="form-group">--}}
 {{--{{ Form::label('Id') }}--}}
@@ -11,7 +12,9 @@
     {{ Form::text('brandName', null, ['class' => 'form-control', 'placeholder' => 'Brand Name', 'required']) }}
 </div>
 <div class="form-group">
-    {{ Form::file('imageFile', null, ['class' => 'form-control-file form_image', 'accept' => 'image/*']) }}
+    {{-- {{ Form::file('imageFile', null, ['class' => 'form-control-file form_image', 'accept' => 'image/*', 'id' => 'image_form']) }}
+    --}}
+    <input type="file" class="form-control-file" id="image_form" accept="image/*" name="imageFile">
 </div>
 <div class="form-group">
     {{ Form::label('Status') }}
@@ -23,9 +26,9 @@
 @break
 
 @case('product_add')
-
 <div class="container-fluid col-12">
-    {{ Form::open(['class' => 'modal_form', 'id' => 'product_form', 'files' => true]) }}
+    {{Form::open(['class' => 'modal_form','id' => 'product_form','files' => true])}}
+    @csrf
     {{ Form::hidden('form_id', 'product_add') }}
     <div class="form-group">
         {{ Form::label('Barcode') }}
@@ -48,16 +51,16 @@
             {{ Form::label('Department') }}
             {{-- {{ Form::select('idSub', ['' => 'Please Select'] + $select_departments, null, ['class' => 'custom-select custom-select-sm', 'id' => 'deptSelect', 'required']) }}
             --}}
-            <select class="custom-select custom-select-sm" id="deptSelect" required="" name="idSub">
-                <option value="" selected="selected">Please Select</option>
+            <select class="custom-select custom-select-sm" id="deptSelect" required name="idSub">
+                <option selected="selected">Please Select</option>
             </select>
         </div>
         <div class="form-group col-md-3">
             {{ Form::label('Sub Department') }}
             {{-- {{ Form::select('idDepartmentSub', ['' => 'Please Select'] + $select_subDepartments, null, ['class' => 'custom-select custom-select-sm', 'id' => 'subdeptSelect', 'required']) }}
             --}}
-            <select class="custom-select custom-select-sm" id="subdeptSelect" required="" name="idDepartmentSub">
-                <option value="" selected="selected">Please Select</option>
+            <select class="custom-select custom-select-sm" id="subdeptSelect" name="idDepartmentSub">
+                <option selected="selected">Please Select</option>
             </select>
         </div>
     </div>
@@ -68,11 +71,15 @@
     <div class="form-row">
         <div class="form-group col-6">
             <span>Product Image: </span>
-            {{ Form::file('imageFile', null, ['class' => 'form-control-file form_image', 'accept' => 'image/*']) }}
+            {{-- {{ Form::file('imageFile', null, ['class' => 'form-control-file form_image', 'accept' => 'image/*', 'id' => 'image_form']) }}
+            --}}
+            <input type="file" class="form-control-file" id="image_form" accept="image/*" name="imageFile">
         </div>
         <div class="form-group col-6">
             <span>Featured Image: </span>
-            {{ Form::file('feaImageFile', null, ['class' => 'form-control-file form_image', 'accept' => 'image/*']) }}
+            {{-- {{ Form::file('feaImageFile', null, ['class' => 'form-control-file form_image', 'accept' => 'image/*']) }}
+            --}}
+            <input type="file" class="form-control-file" id="image_form" accept="image/*" name="feaImageFile">
         </div>
     </div>
     <div class="form-row">
@@ -108,7 +115,8 @@
     {{ Form::textarea('content', null, ['class' => 'form-control', 'placeholder' => 'Post Title'], 'required') }}
 </div>
 <div class="form-group">
-    {{ Form::file('imageFile', null, ['class' => 'form-control-file form_image', 'accept' => 'image/*']) }}
+    {{-- {{ Form::file('imageFile', null, ['class' => 'form-control-file form_image', 'accept' => 'image/*']) }} --}}
+    <input type="file" class="form-control-file" id="image_form" accept="image/*" name="imageFile">
 </div>
 <div class="form-group col-md-3">
     {{ Form::label('Status') }}
@@ -120,17 +128,7 @@
 {{ Form::close() }}
 @break
 
-
-
-{{--
-    ===========================================================================================================================
-    --}}
-
 @case('career_add')
-
-
-{{-- {!! $min !!} --}}
-
 
 {{ Form::open(['class' => 'modal_form', 'id' => 'career_form', 'files' => true]) }}
 {{ Form::hidden('form_id', 'career_add') }}
@@ -190,15 +188,6 @@
 
 @break
 
-
-
-
-
-{{--
-    ===========================================================================================================================
-    --}}
-
-
 @case('branch_add')
 {{ Form::open(['class' => 'modal_form', 'id' => 'branch_form', 'files' => true]) }}
 {{ Form::hidden('form_id', 'branch_add') }}
@@ -213,7 +202,9 @@
             {{ Form::text('branchCode', null, ['class' => 'form-control', 'placeholder' => 'Branch Code', 'required']) }}
         </div>
         <div class="form-group">
-            {{ Form::file('imageFile', null, ['class' => 'form-control-file form_image', 'accept' => 'image/*']) }}
+            {{-- {{ Form::file('imageFile', null, ['class' => 'form-control-file form_image', 'accept' => 'image/*']) }}
+            --}}
+            <input type="file" class="form-control-file" id="image_form" accept="image/*" name="imageFile">
         </div>
         <div class="row">
             <div class="form-group col-6">

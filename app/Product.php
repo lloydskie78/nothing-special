@@ -13,7 +13,9 @@ class Product extends Model
 
     protected $table = 'ctproducts';
     protected $primaryKey = 'idProduct';
-    protected $fillable = ['idBrand', 'idParent', 'idSub', 'prodName', 'prodCode', 'details', 'price', 'imageFile', 'feaImageFile', 'availability', 'isfeatured', 'barcode', 'showProduct'];
+    // protected $fillable = ['idBrand', 'idParent', 'idSub', 'prodName', 'prodCode', 'details', 'price', 'imageFile', 'feaImageFile', 'availability', 'isfeatured', 'barcode', 'showProduct'];
+    protected $guarded = [];
+
 
     public function brand()
     {
@@ -37,6 +39,4 @@ class Product extends Model
     {
         return str_replace("'", "&#39", $value);
     }
-
-
 }
