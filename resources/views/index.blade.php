@@ -7,7 +7,7 @@
         <div class="mySlides fade">
             {{-- <div class="numbertext">3 / 3</div> --}}
             <a href="" target="_blank">
-                <img src="{{ asset('assets/img/banner/LUYW Site banners-Website.jpg') }}"
+                <img src="{{ asset('assets/img/banner/banner_compressed/LUYW Site banners-Website.webp') }}"
                     style="width:100%; height: auto;"
                     onerror="if (this.src != '{{ asset('assets/img/banner/LUYW Site banners-Website.jpg') }}') this.src = '{{ asset('assets/img/banner/LUYW Site banners-Website.jpg') }}';"
                     alt="LUYW Site banner">
@@ -15,17 +15,16 @@
         </div>
         <div class="mySlides fade">
             {{-- <div class="numbertext">3 / 3</div> --}}
-            <a href="https://www.lazada.com.ph/citihardware-inc/?q=Boston%20Bay&langFlag=en&from=wangpu&lang=en&pageTypeId=2&spm=a2o4l.10450891.searchbar.0"
-                target="_blank">
-                <img src="{{ asset('assets/img/banner/lazada_after_party.webp') }}" style="width:100%; height: auto;"
-                    onerror="if (this.src != '{{ asset('assets/img/banner/lazada_after_party.jpg') }}') this.src = '{{ asset('assets/img/banner/lazada_after_party.jpg') }}';"
-                    alt="Lazada After Party">
+            <a href="" target="_blank">
+                <img src="{{ asset('assets/img/banner/banner_compressed/luyw_website banner.webp') }}" style="width:100%; height: auto;"
+                    onerror="if (this.src != '{{ asset('assets/img/banner/luyw_website banner.jpg') }}') this.src = '{{ asset('assets/img/banner/luyw_website banner.jpg') }}';"
+                    alt="LUYW Site banner bulbs">
             </a>
         </div>
         <div class="mySlides fade">
             {{-- <a href=""> --}}
             {{-- <div class="numbertext">2 / 3</div> --}}
-            <img src="{{ asset('assets/img/banner/digos_facade.webp') }}" style="width:100%; height: auto;"
+            <img src="{{ asset('assets/img/banner/banner_compressed/digos_facade.webp') }}" style="width:100%; height: auto;"
                 onerror="if (this.src != '{{ asset('assets/img/banner/digos_facade.jpg') }}') this.src = '{{ asset('assets/img/banner/digos_facade.jpg') }}';"
                 alt="Digos Branch">
             {{-- </a> --}}
@@ -33,7 +32,7 @@
         <div class="mySlides fade">
             {{-- <a href=""> --}}
             {{-- <div class="numbertext">3 / 3</div> --}}
-            <img src="{{ asset('assets/img/banner/mass_display.webp') }}" style="width:100%; height: auto;"
+            <img src="{{ asset('assets/img/banner/banner_compressed/mass_display.webp') }}" style="width:100%; height: auto;"
                 onerror="if (this.src != '{{ asset('assets/img/banner/mass_display.jpg') }}') this.src = '{{ asset('assets/img/banner/mass_display.jpg') }}';"
                 alt="Mass Display">
             {{-- </a> --}}
@@ -41,7 +40,7 @@
         <div class="mySlides fade">
             {{-- <a href=""> --}}
             {{-- <div class="numbertext">3 / 3</div> --}}
-            <img src="{{ asset('assets/img/banner/05_shop & go_lazada_webshop.webp') }}"
+            <img src="{{ asset('assets/img/banner/banner_compressed/05_shop  go_lazada_webshop.webp') }}"
                 style="width:100%; height: auto;"
                 onerror="if (this.src != '{{ asset('assets/img/banner/05_shop & go_lazada_webshop.jpg') }}') this.src = '{{ asset('assets/img/banner/05_shop & go_lazada_webshop.jpg') }}';"
                 alt="Shop & Go Red">
@@ -50,7 +49,7 @@
         <div class="mySlides fade">
             <a href="https://www.lazada.com.ph/shop/citihardware-inc/" target="_blank">
                 {{-- <div class="numbertext">1 / 3</div> --}}
-                <img src="{{ asset('assets/img/banner/citi_lazada.webp') }}" style="width:100%; height: auto;"
+                <img src="{{ asset('assets/img/banner/banner_compressed/citi_lazada.webp') }}" style="width:100%; height: auto;"
                     onerror="if (this.src != '{{ asset('assets/img/banner/citi_lazada.jpg') }}') this.src = '{{ asset('assets/img/banner/citi_lazada.jpg') }}';"
                     alt="CitiHardware Lazada">
             </a>
@@ -59,7 +58,7 @@
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSf00Zm2l15FsTkghkQDf5Gln-eTXuevAwPdIgyUKSKvzR3WHg/viewform"
                 target="_blank">
                 {{-- <div class="numbertext">3 / 3</div> --}}
-                <img src="{{ asset('assets/img/banner/07_shop&go.webp') }}" style="width:100%; height: auto;"
+                <img src="{{ asset('assets/img/banner/banner_compressed/07_shopgo.webp') }}" style="width:100%; height: auto;"
                     onerror="if (this.src != '{{ asset('assets/img/banner/07_shop&go.jpg') }}') this.src = '{{ asset('assets/img/banner/07_shop&go.jpg') }}';"
                     alt="Shop & Go Yellow">
             </a>
@@ -67,7 +66,7 @@
         <div class="mySlides fade">
             <a href="https://shop.citihardware.com/" target="_blank">
                 {{-- <div class="numbertext">3 / 3</div> --}}
-                <img src="{{ asset('assets/img/banner/02_order now.webp') }}" style="width:100%; height: auto;"
+                <img src="{{ asset('assets/img/banner/banner_compressed/02_order now.webp') }}" style="width:100%; height: auto;"
                     onerror="if (this.src != '{{ asset('assets/img/banner/02_order now.jpg') }}') this.src = '{{ asset('assets/img/banner/02_order now.jpg') }}';"
                     alt="Order now">
             </a>

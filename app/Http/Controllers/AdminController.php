@@ -555,14 +555,21 @@ class AdminController extends Controller
                 $data->save();
                 break;
             case 'department_add':
-                $data = new Department();
-                $data->fill($request->except(['_token', 'form_id', 'EBSid']));
-                $this->validate($request, [
 
-                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                try {
 
-                ]);
-                $data->save();
+                    $data = new Department();
+                    $data->fill($request->except(['_token', 'form_id', 'EBSid']));
+                    $this->validate($request, [
+
+                        'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
+                    ]);
+                    $data->save();
+                } catch (\Throwable $th) {
+                    return $th;
+                }
+
                 break;
             case 'subDepartment_add':
                 $data = new SubDepartment();

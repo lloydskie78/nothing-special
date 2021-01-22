@@ -273,6 +273,7 @@
 {{ Form::button('Close', ['type' => 'button', 'class' => 'btn btn-secondary', 'data-dismiss' => 'modal']) }}
 {{ Form::close() }}
 @break
+
 @case('department_add')
 {{ Form::open(['class' => 'modal_form', 'id' => 'department_form']) }}
 {{ Form::hidden('form_id', 'department_add') }}
@@ -298,6 +299,7 @@
 {{ Form::button('Close', ['type' => 'button', 'class' => 'btn btn-secondary', 'data-dismiss' => 'modal']) }}
 {{ Form::close() }}
 @break
+
 @case('subDepartment_add')
 {{ Form::open(['class' => 'modal_form', 'id' => 'subDepartment_form']) }}
 {{ Form::hidden('form_id', 'subDepartment_add') }}
