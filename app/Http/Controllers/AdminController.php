@@ -2,38 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Link;
-use App\News;
-use App\User;
-use App\Brand;
-use App\Banner;
 use App\Branch;
+use App\Brand;
 use App\Career;
-use App\Product;
-use App\Division;
-use Carbon\Carbon;
 use App\Department;
+use App\Division;
+use App\News;
 use App\SubDepartment;
+use App\Banner;
+use App\Link;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Input;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Yajra\Datatables\Datatables;
 
+use App\Product;
 
 class AdminController extends Controller
 {
-    public function BRANCH_API()
-    {
-        $branch = DB::table('ctbranches');
-        return response()->json(['data' => $branch], 200);
-    }
-
     public function __construct()
     {
         $this->middleware('auth');
@@ -42,15 +32,13 @@ class AdminController extends Controller
 
     public function index()
     {
-        // $this->CONVERTFILES();
         $products = Product::all();
-        $users = User::all();
-
-        return view('admin.dashboard', compact('products', 'users'));
+        return view('admin.dashboard', compact('products'));
     }
 
     public function brands()
     {
+
         return view('admin.brands');
     }
 
@@ -88,11 +76,6 @@ class AdminController extends Controller
         return view('admin.division');
     }
 
-    public function departmentSub()
-    {
-        return view('admin.subDepartment');
-    }
-
     public function banner()
     {
         return view('admin.banner');
@@ -103,18 +86,26 @@ class AdminController extends Controller
         return view('admin.link');
     }
 
-    public function productarchive()
+
+    public function departmentSub()
     {
-        return view('admin.productarchive');
+        return view('admin.subDepartment');
     }
 
     //DATABASE INTERACTIONS
+
     public function editItem(Request $request)
     {
         $id = explode(',', $request->input('idToBeUpdated'));
 
         switch ($request->input('form_id')) {
             case 'brand_edit':
+
+                //$this->validate($request, [
+
+                //    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
+                //]);
 
                 $brand = Brand::whereIn('idBrand', $id);
 
@@ -125,7 +116,6 @@ class AdminController extends Controller
                     $image->move($destinationPath, $input['imageFile']);
                     $update = array_merge(['imageFile' => $input['imageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'imageFile']));
 
-                    // create copy in webp
                     $filename = pathinfo($input['imageFile'], PATHINFO_FILENAME);
                     $filepath = $destinationPath . '/' . $input['imageFile'];
                     $this->convertImageToWebP($filepath, $filename, 'brand');
@@ -138,7 +128,11 @@ class AdminController extends Controller
                 break;
             case 'product_edit':
                 try {
+                    //$this->validate($request, [
 
+                    //   'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
+                    //]);
                     $product = Product::whereIn('idProduct', $id);
 
                     if ($request->hasFile('imageFile') && $request->hasFile('feaImageFile')) {
@@ -152,21 +146,17 @@ class AdminController extends Controller
                         $destinationPath = public_path('assets/img/products/featuredImage');
                         $feaImage->move($destinationPath, $input['feaImageFile']);
 
-                        $filepath = $destinationPath . '/' . $input['imageFile'];
-
-                        //after the image is uploaded you need to create a copy in webp
-
                         $update = array_merge(['imageFile' => $input['imageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'imageFile', 'feaImageFile']));
-
-                        $filename = pathinfo($input['imageFile'], PATHINFO_FILENAME);
-                        $filepath = $destinationPath . '/' . $input['imageFile'];
-                        $this->convertImageToWebP($filepath, $filename, 'product');
                     } else if ($request->hasFile('imageFile')) {
                         $image = $request->file('imageFile');
                         $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
                         $destinationPath = public_path('assets/img/products');
                         $image->move($destinationPath, $input['imageFile']);
                         $update = array_merge(['imageFile' => $input['imageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'imageFile']));
+
+                        $filename = pathinfo($input['imageFile'], PATHINFO_FILENAME);
+                        $filepath = $destinationPath . '/' . $input['imageFile'];
+                        $this->convertImageToWebP($filepath, $filename, 'product');
                     } else if ($request->hasFile('feaImageFile')) {
 
                         $feaImage = $request->file('feaImageFile');
@@ -177,8 +167,6 @@ class AdminController extends Controller
                     } else {
                         $update = $request->except(['_token', 'form_id', 'idToBeUpdated']);
                     }
-
-                    // dd($update);
 
                     $data = $product->update($update);
                 } catch (\Throwable $th) {
@@ -232,75 +220,83 @@ class AdminController extends Controller
                     $destinationPath = public_path('assets/img/branch');
 
                     $image->move($destinationPath, $input['imageFile']);
-                    $branch->imageFil8e = $input['imageFile'];
+                    $branch->imageFile = $input['imageFile'];
                     $update = array_merge(['imageFile' => $input['imageFile']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'imageFile']));
                 } else {
                     $update = $request->except(['_token', 'form_id', 'idToBeUpdated']);
                 }
 
                 $data = $branch->update($update);
-
                 break;
             case 'career_edit':
 
-                try {
-                    $this->validate($request, [
-                        'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                    ]);
+                $this->validate($request, [
+                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                ]);
 
-                    if (!isHTML($request->desc)) {
-                        $ulMarkup = GenerateUlMarkUp($request->desc);
-                    } else {
-                        $ulMarkup = $request->desc;
-                    }
-
-                    //? CATCHING EMPTY ARRAYS
-                    if (empty($request->luzBranchEdit)) {
-                        $request->luzBranchEdit = array();
-                        $request->luzBranchEdit['0'] = "0";
-                    }
-                    if (empty($request->visBranchEdit)) {
-                        $request->visBranchEdit = array();
-                        $request->visBranchEdit['0'] = "0";
-                    }
-                    if (empty($request->minBranchEdit)) {
-                        $request->minBranchEdit = array();
-                        $request->minBranchEdit['0'] = "0";
-                    }
-
-                    $selectedBranches = implode(', ', $request->luzBranchEdit) . ', ' . implode(', ', $request->visBranchEdit) . ', ' . implode(', ', $request->minBranchEdit);
-
-                    $request->merge(['desc' => $ulMarkup]);
-                    $career = Career::whereIn('idJob', $id);
-
-                    $update = $request->except(['_token', 'form_id', 'idToBeUpdated', 'luzBranchEdit', 'visBranchEdit', 'minBranchEdit']);
-                    $update['branchId'] = $selectedBranches;
-
-                    $data = $career->update($update);
-                } catch (\Throwable $th) {
-                    return $th;
+                if (!isHTML($request->desc)) {
+                    $ulMarkup = GenerateUlMarkUp($request->desc);
+                } else {
+                    $ulMarkup = $request->desc;
                 }
 
+                //? CATCHING EMPTY ARRAYS
+                if (empty($request->luzBranchEdit)) {
+                    $request->luzBranchEdit = array();
+                    $request->luzBranchEdit['0'] = "0";
+                }
+                if (empty($request->visBranchEdit)) {
+                    $request->visBranchEdit = array();
+                    $request->visBranchEdit['0'] = "0";
+                }
+                if (empty($request->minBranchEdit)) {
+                    $request->minBranchEdit = array();
+                    $request->minBranchEdit['0'] = "0";
+                }
+
+                $selectedBranches = implode(', ', $request->luzBranchEdit) . ', ' . implode(', ', $request->visBranchEdit) . ', ' . implode(', ', $request->minBranchEdit);
+
+                $request->merge(['desc' => $ulMarkup]);
+                $career = Career::whereIn('idJob', $id);
+
+                $update = $request->except(['_token', 'form_id', 'idToBeUpdated', 'luzBranchEdit', 'visBranchEdit', 'minBranchEdit']);
+                $update['branchId'] = $selectedBranches;
+
+                $data = $career->update($update);
+
                 break;
+
             case 'division_edit':
+                $this->validate($request, [
+
+                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
+                ]);
 
                 $career = Division::whereIn('idDivision', $id);
                 $data = $career->update($request->except(['_token', 'form_id', 'idToBeUpdated']));
                 break;
-
             case 'department_edit':
+                $this->validate($request, [
+
+                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
+                ]);
 
                 $career = Department::whereIn('idDepartment', $id);
                 $data = $career->update($request->except(['_token', 'form_id', 'idToBeUpdated']));
                 break;
-
             case 'subDepartment_edit':
+                $this->validate($request, [
+
+                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
+                ]);
 
                 $career = SubDepartment::whereIn('id', $id);
                 $data = $career->update($request->except(['_token', 'form_id', 'idToBeUpdated']));
                 break;
             case 'banner_edit':
-
                 $banner = Banner::whereIn('bannerid', $id);
                 $update = $request->except(['_token', 'form_id', 'idToBeUpdated', 'bannerimage', 'pagevideo', 'page']);
 
@@ -312,13 +308,7 @@ class AdminController extends Controller
                     'pagevideo' => 'mimetypes:video/mp4|max:10000',
                 ]);
 
-
                 // |dimensions:width=470,height=702'
-
-                // $error = $validator->errors()->first();
-                // $error = $validator->errors();
-
-                // dd($error);
 
                 if ($validator->fails()) {
                     return response()->json(['error' => 'the filesize of your video is too large'], 200);
@@ -356,14 +346,16 @@ class AdminController extends Controller
 
                 $data = $banner->update($update);
                 break;
+
             case 'link_edit':
                 $link = Link::whereIn('id', $id);
 
                 $update = $request->except(['_token', 'form_id', 'idToBeUpdated']);
 
                 $this->validate($request, [
-                    'image' => 'nullable|image|mimes:jpeg,jpg|max:2048',
+                    'image' => 'nullable|image|mimes:jpeg,jpg|max:1048',
                 ]);
+
 
                 if ($request->hasFile('image')) {
 
@@ -374,13 +366,15 @@ class AdminController extends Controller
                     $link->image = $input['image'];
                     $update = array_merge(['image' => $input['image']], $request->except(['_token', 'form_id', 'idToBeUpdated', 'image']));
 
-
-                    $filename = pathinfo($input['imageFile'], PATHINFO_FILENAME);
-                    $filepath = $destinationPath . '/' . $input['imageFile'];
+                    $filename = pathinfo($input['image'], PATHINFO_FILENAME);
+                    $filepath = $destinationPath . '/' . $input['image'];
                     $this->convertImageToWebP($filepath, $filename, 'link');
                 }
+
                 $data = $link->update($update);
+
                 break;
+
             default:
                 return response()->json(['error' => 'Uknown Error!!'], 412);
         }
@@ -396,71 +390,68 @@ class AdminController extends Controller
     {
         switch ($request->input('form_id')) {
             case 'brand_add':
-                try {
 
-                    $data = new Brand();
-                    $data->fill($request->except(['_token', 'form_id']));
+                $data = new Brand();
+                $data->fill($request->except(['_token', 'form_id']));
+                // $this->validate($request, [
 
-                    if ($request->hasFile('imageFile')) {
-                        // return 'Hello World';
-                        $image = $request->file('imageFile');
+                //     'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
 
-                        $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
+                // ]);
 
-                        $destinationPath = public_path('assets/img/brands');
-
-                        $image->move($destinationPath, $input['imageFile']);
-                        $data->imageFile = $input['imageFile'];
-                    } else {
-                        // use the file path in the default img
-                        $data->imageFile = "na.webp";
-                    }
+                if ($request->hasFile('imageFile')) {
 
 
-                    $data->save();
-                } catch (\Throwable $th) {
-                    return $th;
+                    $image = $request->file('imageFile');
+
+                    $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
+
+                    $destinationPath = public_path('assets/img/brands');
+
+                    $image->move($destinationPath, $input['imageFile']);
+                    $data->imageFile = $input['imageFile'];
                 }
+
+                $data->save();
 
                 break;
             case 'product_add':
+                $data = new Product();
+                $data->fill($request->except(['_token', 'form_id']));
+                //$this->validate($request, [
 
-                try {
-                    $data = new Product();
-                    $data->fill($request->except(['_token', 'form_id']));
+                //    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
 
-                    if ($request->hasFile('imageFile')) {
+                //]);
 
-                        $image = $request->file('imageFile');
+                if ($request->hasFile('imageFile')) {
 
-                        $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
 
-                        $destinationPath = public_path('assets/img/products');
+                    $image = $request->file('imageFile');
 
-                        $image->move($destinationPath, $input['imageFile']);
+                    $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
 
-                        $data->imageFile = $input['imageFile'];
-                    }
+                    $destinationPath = public_path('assets/img/products');
 
-                    if ($request->hasFile('feaImageFile')) {
-
-                        $feaImage = $request->file('feaImageFile');
-
-                        $input['feaImageFile'] = pathinfo($feaImage->getClientOriginalName(), PATHINFO_FILENAME) . '.' . $feaImage->getClientOriginalExtension();
-
-                        $destinationPath = public_path('assets/img/products/featuredImage');
-
-                        $feaImage->move($destinationPath, $input['feaImageFile']);
-                        $data->feaImageFile = $input['feaImageFile'];
-                    }
-
-                    $data->save();
-                } catch (\Throwable $th) {
-                    return $th;
+                    $image->move($destinationPath, $input['imageFile']);
+                    $data->imageFile = $input['imageFile'];
                 }
 
-                break;
+                if ($request->hasFile('feaImageFile')) {
 
+
+                    $feaImage = $request->file('feaImageFile');
+
+                    $input['feaImageFile'] = pathinfo($feaImage->getClientOriginalName(), PATHINFO_FILENAME) . '.' . $feaImage->getClientOriginalExtension();
+
+                    $destinationPath = public_path('assets/img/products/featuredImage');
+
+                    $feaImage->move($destinationPath, $input['feaImageFile']);
+                    $data->feaImageFile = $input['feaImageFile'];
+                }
+
+                $data->save();
+                break;
             case 'news_add':
                 $data = new News();
                 $data->fill($request->except(['_token', 'form_id']));
@@ -472,9 +463,13 @@ class AdminController extends Controller
 
                 if ($request->hasFile('imageFile')) {
 
+
                     $image = $request->file('imageFile');
+
                     $input['imageFile'] = time() . '.' . $image->getClientOriginalExtension();
+
                     $destinationPath = public_path('assets/img/news');
+
                     $image->move($destinationPath, $input['imageFile']);
                     $data->imageFile = $input['imageFile'];
                 }
@@ -505,9 +500,7 @@ class AdminController extends Controller
 
                 $data->save();
                 break;
-
             case 'career_add':
-
 
                 $ulMarkup = GenerateUlMarkUp($request->desc);
                 $request->merge(['desc' => $ulMarkup]);
@@ -555,21 +548,14 @@ class AdminController extends Controller
                 $data->save();
                 break;
             case 'department_add':
+                $data = new Department();
+                $data->fill($request->except(['_token', 'form_id', 'EBSid']));
+                $this->validate($request, [
 
-                try {
+                    'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
 
-                    $data = new Department();
-                    $data->fill($request->except(['_token', 'form_id', 'EBSid']));
-                    $this->validate($request, [
-
-                        'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-
-                    ]);
-                    $data->save();
-                } catch (\Throwable $th) {
-                    return $th;
-                }
-
+                ]);
+                $data->save();
                 break;
             case 'subDepartment_add':
                 $data = new SubDepartment();
@@ -589,108 +575,6 @@ class AdminController extends Controller
             return response()->json(['error' => $data], 412);
         } else {
             return response()->json(['success' => 'Added'], 200);
-        }
-    }
-
-    public function db_restore(Request $request)
-    {
-        $rows = explode(',', $request->input('rows'));
-        switch ($request->input('table')) {
-            case 'brand_table':
-
-                break;
-            case 'product_table':
-
-                break;
-            case 'productsarchive_table':
-                $data = Product::onlyTrashed()->whereIn('idProduct', $rows)->restore();
-                break;
-
-            case 'news_table':
-
-                break;
-            case 'branch_table':
-
-                break;
-            case 'career_table':
-
-                break;
-            case 'division_table':
-
-                break;
-            case 'department_table':
-
-                break;
-            case 'subDepartment_table':
-
-                break;
-            default:
-                return response()->json(['error' => 'Uknown Error!!'], 412);
-        }
-
-        if ($data == null) {
-            return response()->json(['error' => $data], 412);
-        } else {
-            return response()->json('success', 200);
-        }
-    }
-
-    public function db_harddelete(Request $request)
-    {
-
-        $rows = explode(',', $request->input('rows'));
-        $imagePath = public_path() . '/assets/img/';
-        switch ($request->input('table')) {
-            case 'brand_table':
-                $imageRows = Brand::whereIn('idBrand', $rows)->pluck('imageFile');
-                foreach ($imageRows as $image) {
-                    $file = File::delete($imagePath . 'brands/' . $image);
-                }
-
-                $data = Brand::forceDelete($rows);
-                break;
-            case 'productsarchive_table':
-                // $imageRows = Product::whereIn('idProduct',$rows)->get(['imageFile','feaImageFile']);
-                // foreach ($imageRows as $image){
-                //     $file = File::delete($imagePath.'products/'.$image->imageFile);
-                //     $feaFile = File::delete($imagePath.'products/featuredImage/'.$image->feaImageFile);
-                // }
-                $data = Product::onlyTrashed()->whereIn('idProduct', $rows)->forceDelete();
-                break;
-            case 'news_table':
-                $imageRows = News::whereIn('idNews', $rows)->pluck('imageFile');
-                foreach ($imageRows as $image) {
-                    $file = File::delete($imagePath . 'news/' . $image);
-                }
-                $data = News::forceDelete($rows);
-                break;
-            case 'branch_table':
-                $imageRows = Branch::whereIn('idBranch', $rows)->pluck('imageFile');
-                foreach ($imageRows as $image) {
-                    $file = File::delete($imagePath . 'branch/' . $image);
-                }
-                $data = Branch::forceDelete($rows);
-                break;
-            case 'career_table':
-                $data = Career::forceDelete($rows);
-                break;
-            case 'division_table':
-                $data = Division::forceDelete($rows);
-                break;
-            case 'department_table':
-                $data = Department::forceDelete($rows);
-                break;
-            case 'subDepartment_table':
-                $data = SubDepartment::forceDelete($rows);
-                break;
-            default:
-                return response()->json(['error' => 'Uknown Error!!'], 412);
-        }
-
-        if ($data == null) {
-            return response()->json(['error' => $data], 412);
-        } else {
-            return response()->json('success', 200);
         }
     }
 
@@ -714,7 +598,6 @@ class AdminController extends Controller
                     $file = File::delete($imagePath . 'products/' . $image->imageFile);
                     $feaFile = File::delete($imagePath . 'products/featuredImage/' . $image->feaImageFile);
                 }
-
                 $data = Product::destroy($rows);
                 break;
             case 'news_table':
@@ -762,36 +645,6 @@ class AdminController extends Controller
                 break;
             case 'products':
                 $model = Product::query();
-                // $model = Product::query()->take(10)->get();
-
-                return DataTables::of($model)
-                    ->addColumn('brandName', function (Product $product) {
-                        $brand = Brand::where('idBrand', $product->idBrand)->first();
-                        if ($brand === null) {
-                            return 'No Brand';
-                        } else {
-                            return $brand->brandName;
-                        }
-                    })->addColumn('parent', function (Product $product) {
-                        $parent = Division::where('idDivision', $product->idParent)->first();
-                        if ($parent === null) {
-                            return 'NULL';
-                        } else {
-                            return $parent->Division;
-                        }
-                    })->addColumn('subParent', function (Product $product) {
-                        $subParent = Department::where('idDepartment', $product->idSub)->first();
-                        if ($subParent === null) {
-                            return 'NULL';
-                        } else {
-                            return $subParent->Department;
-                        }
-                    })
-                    ->make(true);
-                break;
-            case 'productsarchive':
-
-                $model = Product::onlyTrashed();
 
                 return DataTables::of($model)
                     ->addColumn('brandName', function (Product $product) {
@@ -817,7 +670,6 @@ class AdminController extends Controller
                         }
                     })
                     ->make(true);
-
                 break;
             case 'news':
 
@@ -848,11 +700,6 @@ class AdminController extends Controller
                     })
                     ->make(true);
                 break;
-            case 'link':
-                // $link = DB::table('ctlinks')->select('id','image','desc')>where('status', 1)->get();
-                $link = Link::query();
-                return Datatables::of($link)->make(true);
-                break;
             case 'divisions':
                 $db_table = 'ctdivision';
                 break;
@@ -866,10 +713,17 @@ class AdminController extends Controller
                     ->make(true);
                 break;
             case 'banner':
+
                 $banner = Banner::query();
                 return DataTables::of($banner)
                     ->make(true);
                 break;
+            case 'link':
+                // $link = DB::table('ctlinks')->select('id','image','desc')>where('status', 1)->get();
+                $link = Link::query();
+                return Datatables::of($link)->make(true);
+                break;
+
             default:
                 return false;
         }
@@ -881,11 +735,6 @@ class AdminController extends Controller
     {
         $form_id = $request->input('btn_id');
 
-        // dd($form_id);
-        // return;
-
-        // dd($request->all());
-
         $id = explode(',', $request->input('rows'));
         if (count($id) == 1) {
             $id_update = $request->input('rows');
@@ -893,8 +742,9 @@ class AdminController extends Controller
             return view('admin.ajax.modalMultiEdit', ['data' => $request->input('rows'), 'form_id' => $form_id]);
         }
 
+
         switch ($form_id) {
-            case 'brand_edit':
+            case '`brand_edit`':
                 $data = Brand::find($id_update);
                 break;
             case 'product_edit':
@@ -937,58 +787,6 @@ class AdminController extends Controller
 
         return view('admin.ajax.modalAdd', ['form_id' => $form_id]);
     }
-    //Additional functions Aug 28, 2019 dev: Pit
-
-    public function imageUploadPost(Request $request)
-    {
-        if ($request->hasFile('imageFile')) {
-
-            //check if the file is png ,dimension and file size
-            $validator = Validator::make($request->all(), [
-                'imageFile' => 'nullable|image|mimes:png,svg|max:1048|dimensions:width=470,height=702'
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json(['error' => 'Invalid dimension or file type'], 200);
-            }
-
-            $image = $request->file('imageFile');
-            $input['imageFile'] = 'map.' . $image->getClientOriginalExtension();
-            $destinationPath = public_path('assets/img/');
-            $image->move($destinationPath, $input['imageFile']);
-            return response()->json(['success' => 'Edited'], 200);
-            return view('admin.ajax.modalSetmap');
-        } else {
-            return response()->json(['error' => 'There is no file selected'], 200);
-        }
-    }
-
-    public function setXY(Request $request)
-    {
-        $id = $request->id;
-        $result = DB::table('ctbranches')->where('idBranch', $id)->first();
-        return view('admin.ajax.modalMap', ['tooltipx' => $request->tooltipx, 'tooltipy' => $request->tooltipy, 'id' => $result->idBranch, 'branch' => $result->branchName]);
-    }
-
-    public function modalMap(Request $request)
-    {
-        $id = $request->id;
-
-        $result = DB::table('ctbranches')->where('idBranch', $id)->first();
-        // dd($result);
-        return view('admin.ajax.modalMap', ['tooltipx' => $result->tooltipx, 'tooltipy' => $result->tooltipy, 'id' => $result->idBranch, 'branch' => $result->branchName]);
-    }
-
-    public function SAVE_TOOLTIP(Request $request)
-    {
-        Branch::where('idBranch', $request->id)->update(array('tooltipx' => $request->tooltipx, 'tooltipy' => $request->tooltipy));
-        return response()->json(['success' => 'Edited'], 200);
-    }
-
-    public function setMap(Request $request)
-    {
-        return view('admin.ajax.modalSetmap');
-    }
 
     public function convertImageToWebP($source, $destinationfile, $module, $quality = 70)
     {
@@ -999,7 +797,7 @@ class AdminController extends Controller
         if ($module === 'product') {
             $destination = public_path('assets/img/productwebp/');
         } else if ($module === 'brand') {
-            $destination = public_path('assets/img/brandwebp/');
+            $destination = public_path('assets/img/brandswebp/');
         } else if ($module === 'link') {
             $destination = public_path('assets/img/featuredwebp/');
         } else if ($module === 'banner') {

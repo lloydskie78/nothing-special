@@ -31,7 +31,8 @@ class AppServiceProvider extends ServiceProvider
         $min = DB::table('ctbranches')->where('islandGroup', 3)->orderBy('branchName', 'asc')->get();
         $branches = DB::table('ctbranches')->orderBy('branchName', 'asc')->get();
         $branchesCount = DB::table('ctbranches')->count();
-        $brandSpecific = Brand::select('idBrand', 'brandName', 'imageFile')->where('brandName', 'LIKE', '%La Fonza%')
+        $brandSpecific = Brand::select('idBrand', 'brandName', 'imageFile')
+            ->where('brandName', 'LIKE', '%La Fonza%')
             ->orWhere('brandName', 'LIKE', '%Boston Bay%')
             ->orWhere('brandName', 'LIKE', '%Hausmann%')
             ->orWhere('brandName', 'LIKE', '%Designcraft%')
