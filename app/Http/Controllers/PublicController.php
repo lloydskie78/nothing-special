@@ -115,6 +115,7 @@ class PublicController extends Controller
                 ->leftJoin('ctbrands', 'ctproducts.idBrand', '=', 'ctbrands.idBrand')
                 ->leftJoin('department_sub', 'ctproducts.idDepartmentSub', '=', 'department_sub.id')
                 ->where('ctproducts.availability', '=', 1)
+                ->where('idParent', 16)
                 ->whereRaw("MATCH ({$request->fieldtofilter}) AGAINST (? IN BOOLEAN MODE)", array($search))
                 ->orwhereRaw(DB::raw("REPLACE(department_sub.departmentSubName, ' ','') LIKE '%{$subdepartmentsearch}%' "))
                 ->orderBy('relevance', 'DESC')
@@ -171,7 +172,7 @@ class PublicController extends Controller
         $subdepartmentsearch = str_replace(' ', '', $request->search);
 
         if ($request->has('search')) {
-            
+
             $products = Product::select('ctproducts.idProduct', 'ctproducts.idSub', 'ctproducts.details', 'ctproducts.imageFile', 'ctbrands.imageFile as brandImageFile', 'ctbrands.brandName', 'department_sub.departmentSubName', 'ctproducts.prodName', 'ctdepartment.Department', 'ctdivision.Division')
                 ->selectRaw("MATCH ({$request->fieldtofilter}) AGAINST (?) AS relevance", array($search))
                 ->leftJoin('ctbrands', 'ctproducts.idBrand', '=', 'ctbrands.idBrand')
@@ -179,6 +180,7 @@ class PublicController extends Controller
                 ->leftJoin('ctdivision', 'ctproducts.idParent', '=', 'ctdivision.idDivision')
                 ->leftJoin('department_sub', 'ctproducts.idDepartmentSub', '=', 'department_sub.id')
                 ->where('ctproducts.availability', '=', 1)
+                ->where('idParent', 16)
                 ->whereRaw("MATCH ({$request->fieldtofilter}) AGAINST (? IN BOOLEAN MODE)", array($search))
                 ->orwhereRaw(DB::raw("REPLACE(department_sub.departmentSubName, ' ','') like '%{$subdepartmentsearch}%' "))
                 ->orderBy('relevance', 'DESC')
@@ -516,7 +518,8 @@ class PublicController extends Controller
 
     public function productSearch(Request $request)
     {
-        $search_results = Product::search($request['query'])->get();
+
+        $search_results = Product::search($request['query'])->where('idParent', 16)->get();
 
         return view('ajax.productSearch', compact('search_results'));
     }

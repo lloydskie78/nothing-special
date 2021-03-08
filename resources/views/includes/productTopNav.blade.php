@@ -3,22 +3,22 @@
         <label id='lblsearch'>Search by</label>
         <div class="subDepDropDown">
             <button class="dropbtn" id='btnfilter'>Description <i class="fas fa-sort-down"></i></button>
-                @if (strpos(Request::path(), 'products/wall-and-floor-tiles') !== false)
-                    <div class="dropdown-content" id='btnfilter'>
-                        <a href='' id='details'>Description</a>
-                        <a href='' id='brandName'>Brand</a>
-                        @foreach ($wall_and_floor as $item)
-                            <a href='' id='details'>{{ $item->departmentSubName }}</a>
-                        @endforeach
-                        @yield('subDepartmentLink')
-                    </div>
-                @else
-                    <div class="dropdown-content" id='btnfilter'>
-                        <a href='' id='details'>Description</a>
-                        <a href='' id='brandName'>Brand</a>
-                        @yield('subDepartmentLink')
-                    </div>
-                @endif
+            @if (strpos(Request::path(), 'products/wall-and-floor-tiles') !== false)
+            <div class="dropdown-content" id='btnfilter'>
+                <a href='' id='details'>Description</a>
+                <a href='' id='brandName'>Brand</a>
+                @foreach ($wall_and_floor as $item)
+                <a href='' id='details'>{{ $item->departmentSubName }}</a>
+                @endforeach
+                @yield('subDepartmentLink')
+            </div>
+            @else
+            <div class="dropdown-content" id='btnfilter'>
+                <a href='' id='details'>Description</a>
+                <a href='' id='brandName'>Brand</a>
+                @yield('subDepartmentLink')
+            </div>
+            @endif
         </div>
     </div>
     <div id="productSearchContainer">
@@ -31,4 +31,4 @@
         {{ Form::close() }}
         <i class="fas fa-search searchBtn"></i>
     </div>
-</div>
+</div>  

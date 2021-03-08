@@ -48,6 +48,8 @@ Route::post('{url}', 'PublicController@modalAjax')->where(['url' => 'modalhandle
 Route::post('/sendmail', 'PublicController@emailSumbit');
 Route::get('branch_tooltip', 'PublicController@LOAD_TOOLTIP');
 
+Route::post('/customSearch', 'PublicController@searchCustom')->name('searchOnSelect');
+
 // Route::any('{slug}', function () {
 //     return view('errors.404');
 // });
